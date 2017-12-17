@@ -72,7 +72,8 @@ function markThread(info){
         let th = thread_map[i];
 
         if(th.name == info.thread_name){
-            th.td.setAttribute("style", marker_style);
+//          th.td.setAttribute("style", marker_style);
+            th.td.style.cssText += marker_style;
             break;
         }
     }
@@ -89,7 +90,8 @@ function markOpenedThreads(response){
 
         for(let j = 0; j < opened_thread_names.length; ++j){
             if(th.name == opened_thread_names[j]){
-                th.td.setAttribute("style", marker_style);
+//              th.td.setAttribute("style", marker_style);
+                th.td.style.cssText += marker_style;
             }
         }
 
