@@ -1,7 +1,7 @@
 {
     "manifest_version":2,
 
-    "name":"KOSHIAN Catalog Marker",
+    "name":"KOSHIAN Catalog Marker kai",
 
     "version":"1.0.0",
 
@@ -35,7 +35,7 @@
 
     "applications":{
         "gecko":{
-            "id":"{242e2746-f3c2-4f1d-af28-0b48382962ac}"
+            "id":"{AE670138-E325-11E7-A724-0B411743E317}"
         }
     }
 }
