@@ -1,6 +1,8 @@
 ## KOSHIAN Catalog Marker kai
 このアドオンは[Pachira](https://addons.mozilla.org/ja/firefox/user/anonymous-a0bba9187b568f98732d22d51c5955a6/)氏の[KOSHIAN 開いたスレをカタログにマーク](https://addons.mozilla.org/ja/firefox/addon/koshian-catalog-marker/)アドオンを改変したものです  
 
+※他のKOSHIANアドオン改変版は[こちら](https://github.com/akoya-tomo/futaba_auto_reloader_K/wiki)の一覧からどうぞ
+
 ## 機能
 * オリジナルの機能（KOSHIAN 開いたスレをカタログにマーク）
   - ふたば☆ちゃんねるのカタログ画面で開いたスレをマークしたりレス数の増加を表示します
