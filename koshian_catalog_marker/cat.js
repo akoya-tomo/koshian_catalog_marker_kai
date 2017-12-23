@@ -74,9 +74,18 @@ function markThread(info){
         if(th.name == info.thread_name){
 //          th.td.setAttribute("style", marker_style);
             th.td.style.cssText += marker_style;
+            th.td.classList.add("GM_kcm_opened");
             break;
         }
     }
+
+    let elem = document.getElementById("hdp");
+    if (elem) {
+		if (!document.getElementById("kcm_mark_thre_comp")) {
+            elem.insertAdjacentHTML('afterend','<div id ="kcm_mark_thre_comp" style = "display:none"></div>');
+        }
+    }
+
 }
 
 function markOpenedThreads(response){
@@ -92,6 +101,7 @@ function markOpenedThreads(response){
             if(th.name == opened_thread_names[j]){
 //              th.td.setAttribute("style", marker_style);
                 th.td.style.cssText += marker_style;
+                th.td.classList.add("GM_kcm_opened");
             }
         }
 
@@ -106,6 +116,13 @@ function markOpenedThreads(response){
             
             //console.log(`thread[${new_response_nums[j].name}] + ${new_response_nums[j].increase}`)
             //console.log(new_response_nums[j]);
+        }
+    }
+
+    let elem = document.getElementById("hdp");
+    if (elem) {
+		if (!document.getElementById("kcm_mark_opened_thre_comp")) {
+            elem.insertAdjacentHTML('afterend','<div id ="kcm_mark_opened_thre_comp" style = "display:none"></div>');
         }
     }
 
