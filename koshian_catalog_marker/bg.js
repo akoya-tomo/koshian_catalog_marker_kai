@@ -232,7 +232,7 @@ function onChangeSetting(changes, areaName){
 
 browser.storage.onChanged.addListener(onChangeSetting);
 
-browser.storage.local.get("").then(onGetSettings, onError);
+browser.storage.local.get().then(onGetSettings, onError);
 
 browser.runtime.onMessage.addListener((message, sender, response) => {
     switch(message.id){
