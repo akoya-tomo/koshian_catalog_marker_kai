@@ -21,7 +21,7 @@
     futaba thread highlighter K rev5で本アドオン以外の既読マークできるアドオンでもピックアップできるようになりました。  
 
 ## インストール
-[GitHub](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v1.1.0/koshian_catalog_marker_kai-1.1.0-an.fx.xpi)
+[GitHub](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v1.2.0/koshian_catalog_marker_kai-1.2.0-an.fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
