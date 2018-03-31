@@ -12,7 +12,7 @@ class Thread{
     }
 }
 
-const DEFAULT_MARKER_STYLE = "border:2px solid #400080"
+const DEFAULT_MARKER_STYLE = "border:2px solid #400080";
 let marker_style = DEFAULT_MARKER_STYLE;
 let thread_map = [];
 
@@ -72,17 +72,19 @@ function markThread(info){
         let th = thread_map[i];
 
         if(th.name == info.thread_name){
-//          th.td.setAttribute("style", marker_style);
-            th.td.style.cssText += marker_style;
-            th.td.classList.add("GM_kcm_opened");
-            break;
+            if (!th.td.classList.contains("GM_kcm_opened")) {
+                //th.td.setAttribute("style", marker_style);
+                th.td.style.cssText += marker_style;
+                th.td.classList.add("GM_kcm_opened");
+                break;
+            }
         }
     }
 
     let elem = document.getElementById("hdp");
     if (elem) {
-		if (!document.getElementById("kcm_mark_thre_comp")) {
-            elem.insertAdjacentHTML('afterend','<div id ="kcm_mark_thre_comp" style = "display:none"></div>');
+        if (!document.getElementById("kcm_mark_thre_comp")) {
+            elem.insertAdjacentHTML("afterend","<div id ='kcm_mark_thre_comp' style = 'display:none'></div>");
         }
     }
 
@@ -99,9 +101,11 @@ function markOpenedThreads(response){
 
         for(let j = 0; j < opened_thread_names.length; ++j){
             if(th.name == opened_thread_names[j]){
-//              th.td.setAttribute("style", marker_style);
-                th.td.style.cssText += marker_style;
-                th.td.classList.add("GM_kcm_opened");
+                if (!th.td.classList.contains("GM_kcm_opened")) {
+                    //th.td.setAttribute("style", marker_style);
+                    th.td.style.cssText += marker_style;
+                    th.td.classList.add("GM_kcm_opened");
+                }
             }
         }
 
@@ -121,8 +125,8 @@ function markOpenedThreads(response){
 
     let elem = document.getElementById("hdp");
     if (elem) {
-		if (!document.getElementById("kcm_mark_opened_thre_comp")) {
-            elem.insertAdjacentHTML('afterend','<div id ="kcm_mark_opened_thre_comp" style = "display:none"></div>');
+        if (!document.getElementById("kcm_mark_opened_thre_comp")) {
+            elem.insertAdjacentHTML("afterend","<div id ='kcm_mark_opened_thre_comp' style = 'display:none'></div>");
         }
     }
 
