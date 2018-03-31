@@ -2,7 +2,14 @@
 /* globals notify,getBoardName,getThreadName*/
 
 //console.log("bg.js 1.0.1");
-
+const DEFAULT_CATALOG_TIME = 1;
+const DEFAULT_TAB_TIME = 1;
+const DEFAULT_THREAD_TIME = 1;
+const DEFAULT_RES_TIME = 1;
+let catalog_time = DEFAULT_CATALOG_TIME;
+let tab_time = DEFAULT_TAB_TIME;
+let thread_time = DEFAULT_THREAD_TIME;
+let res_time = DEFAULT_RES_TIME;
 let ADJUST_PERIOD = 1000*60*10;
 let MAX_CATALOG_TIME = 1000*60*60;
 let MAX_TAB_TIME = 1000*60*60;
@@ -111,7 +118,7 @@ class Catalog{
     adjust(date, max_tab_time, max_thread_time){
         Updatable.adjust(this.tabs, date, max_tab_time);
         Updatable.adjust(this.threads, date, max_thread_time);
-        Updatable.adjust(this.res_nums, date, MAX_RES_TIME);
+        Updatable.adjust(this.res_nums, date, MAX_RES_TIME * res_time);
     }
 
     getLastUpdate(){
@@ -154,7 +161,7 @@ function onLoadThread(info){
         return;
     }
 
-    catalog.registerThread(info.date, info.thread_name)
+    catalog.registerThread(info.date, info.thread_name);
 
     let tab_id_list = catalog.getActiveTabs();
     
@@ -180,6 +187,7 @@ function registerCatalog(info, tab_id, response){
 }
 
 function updateCatalog(catalog, info, tab_id, response){
+    catalog.date = info.date;
     catalog.registerTab(info.date, tab_id);
     let increases = catalog.updateResponseNums(info.date, info.res_nums);
 
@@ -201,18 +209,25 @@ function onLoadCatalog(info, tab_id, response){
     }    
 }
 
+function safeGetValue(value, default_value) {
+    return value === undefined ? default_value : value;
+}
+
 function onError(error){
 
 }
 
 function onGetSettings(result){
-
+    catalog_time = safeGetValue(result.catalog_time, DEFAULT_CATALOG_TIME);
+    thread_time = safeGetValue(result.thread_time, DEFAULT_THREAD_TIME);
 }
 
 function onChangeSetting(changes, areaName){
     if(areaName != "local"){
         return;
     }
+    catalog_time = safeGetValue(changes.catalog_time.newValue, DEFAULT_CATALOG_TIME);
+    thread_time = safeGetValue(changes.thread_time.newValue, DEFAULT_THREAD_TIME);
 }
 
 browser.storage.onChanged.addListener(onChangeSetting);
@@ -235,8 +250,8 @@ setInterval(() => {
 
     catalog_map = catalog_map.filter((catalog, index, array) => {
         //catalog.showLog();
-        catalog.adjust(date, MAX_TAB_TIME, MAX_THREAD_TIME);
-        return ((date.getTime() - catalog.getLastUpdate().getTime()) < MAX_CATALOG_TIME);
+        catalog.adjust(date, MAX_TAB_TIME * tab_time, MAX_THREAD_TIME * thread_time);
+        return ((date.getTime() - catalog.getLastUpdate().getTime()) < MAX_CATALOG_TIME * catalog_time);
     });
 
 }, ADJUST_PERIOD);

@@ -8,8 +8,18 @@
   <body>
 
     <form>
-        <p><label>開いたスレのスタイル<input type="text" id="marker_style"></label></p>
-        <button type="submit">Save</button>
+      <p><label>開いたスレのスタイル<input type="text" id="marker_style"></label></p>
+      <br>
+      <p>
+        カタログの全情報をカタログの最終更新から<br>
+        <input type="number" id="catalog_time" min = "1" max = "12">
+        <label for="catalog_time">時間保持する（最大12時間）</label><br>
+        <br>
+        開いたスレの情報をスレの最終更新から<br>
+        <input type="number" id="thread_time" min = "1" max = "12">
+        <label for="thread_time">時間保持する（最大12時間）</label><br>
+      </p>
+      <button type="submit">Save</button>
     </form>
 
     <script src="options.js"></script>
