@@ -16,9 +16,6 @@
   - 「開いたスレのスタイル」でカタログにマークする動作を上書きから追記に変更  
     [toshiakisp](https://github.com/toshiakisp)氏の[「合間合間に」\(改変版\)](http://toshiakisp.github.io/akahuku-firefox-sp/#others)アドオンが「スレを無かった事にする」設定で消したスレを、KOSHIAN 開いたスレをカタログにマークアドオンが「開いたスレのスタイル」で上書きすることによって、消したスレが表示されてしまいます。  
     そのためマークする動作を追記にして非表示設定が上書きされないように変更しました。  
-  - [futaba thread highlighter K](https://github.com/akoya-tomo/futaba_thread_highlighter_K)との連携機能追加  
-    ~~futaba thread highlighter Kで既読スレをピックアップするための機能を追加しました。~~  
-    futaba thread highlighter K rev5で本アドオン以外の既読マークできるアドオンでもピックアップできるようになりました。  
 
 ## インストール
 [GitHub](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v1.2.1/koshian_catalog_marker_kai-1.2.1-an.fx.xpi)
@@ -31,8 +28,7 @@
 * オリジナル版とは別アドオンなので設定は初期値に戻ります。  
   再度設定をお願い致します。  
 * オリジナル版のAMO\(addons.mozilla.org\)での名称と本アドオンの名称が異なるのは、オリジナル版のアドオン内に登録された名称（アドオンマネージャー\(about:addons\)に表示される名称）に合わせているためです。  
-* ~~futaba thread highlighter Kで既読スレピックアップ機能を使うときは必ず**v1.1以上**をインストールして下さい。~~  
-  futaba thread highlighter K rev5でバージョン制限は無くなりました。  
+* [futaba\_catalog\_mod（モダンバージョン）](https://userstyles.org/styles/114129/futaba-catalog-mod-modern)使用時に既読マークが付かないときは開いたスレのスタイルの末尾に"!important"を追記して下さい。  
 
 ## 更新履歴
 * v1.2.1 2018-03-31
