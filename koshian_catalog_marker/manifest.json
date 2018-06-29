@@ -3,7 +3,7 @@
 
     "name":"KOSHIAN Catalog Marker kai",
 
-    "version":"1.2.1",
+    "version":"1.2.2",
 
     "description":"開いたスレをマークしたりレス数の増加を表示します",
 
@@ -15,11 +15,13 @@
         {
             "exclude_matches": ["*://*.2chan.net/*/res/*","*://*.2chan.net/*/src/*"],
             "matches":["*://*.2chan.net/*/*"],
-            "js":["util.js","cat.js"]
+            "js":["util.js","cat.js"],
+            "all_frames": true
         },
         {
             "matches":["*://*.2chan.net/*/res/*"],
-            "js":["util.js","res.js"]
+            "js":["util.js","res.js"],
+            "all_frames": false
         }
     ],
 

@@ -1,15 +1,15 @@
-## KOSHIAN Catalog Marker kai
-このFirefoxアドオンはふたば☆ちゃんねるのカタログ画面で開いたスレをマークしたりレス数の増加を表示する[Pachira](https://addons.mozilla.org/ja/firefox/user/anonymous-a0bba9187b568f98732d22d51c5955a6/)氏の[KOSHIAN 開いたスレをカタログにマーク](https://addons.mozilla.org/ja/firefox/addon/koshian-catalog-marker/)アドオンを改変したものです。  
+## <sub><img src="koshian_catalog_marker/icons/icon-48.png"></sub> KOSHIAN Catalog Marker kai
+このFirefoxアドオンはふたば☆ちゃんねるのカタログ画面で開いたスレをマークしたりレス数の増加を表示する[Pachira](https://addons.mozilla.org/ja/firefox/user/anonymous-a0bba9187b568f98732d22d51c5955a6/)氏の[KOSHIAN 開いたスレをカタログにマーク](https://addons.mozilla.org/ja/firefox/addon/koshian-catalog-marker/)の非公式改変版です。  
 開いたスレやレス数の情報が閲覧中に消えにくいようにオリジナル版から変更しています。  
 
 ※このアドオンはWebExtensionアドオン対応のFirefox専用となります。  
-※他のこしあんアドオン改変版とUserscriptは[こちら](https://github.com/akoya-tomo/futaba_auto_reloader_K/wiki/)の一覧からどうぞ。  
+※他のKOSHIAN改変版などのふたば支援ツールは[こちら](https://github.com/akoya-tomo/futaba_auto_reloader_K/wiki/)。  
 
 ## 機能
 * オリジナルの機能（KOSHIAN 開いたスレをカタログにマーク）
   - ふたば☆ちゃんねるのカタログ画面で開いたスレをマークしたりレス数の増加を表示します。
 * 追加・変更された機能（KOSHIAN Catalog Marker kai）
-  - \(New\) 開いたスレやレス数の情報を保持する条件や時間を変更  
+  - 開いたスレやレス数の情報を保持する条件や時間を変更  
     オリジナル版ではカタログを開いてから1時間後にカタログの全情報（開いたスレやレス数の情報を含む）がクリアされます。これをカタログが**最後に更新**されてから**設定時間後**にクリアするように変更しました。  
     また、開いたスレの情報もスレを開いてから1時間後にクリアされていましたが、スレが**最後に更新**されてから**設定時間後**にクリアするように変更しました。  
     上記の情報の保持時間はアドオンのオプション画面で設定できます。デフォルトの1時間だと頻繁にクリアされる場合は増やしてみてください。  
@@ -18,19 +18,21 @@
     そのためマークする動作を追記にして非表示設定が上書きされないように変更しました。  
 
 ## インストール
-[GitHub](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v1.2.1/koshian_catalog_marker_kai-1.2.1-an.fx.xpi)
+**GitHub**  
+[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v1.2.2/koshian_catalog_marker_kai-1.2.2-an.fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
 ## 注意事項
-* このアドオンはWebExtensionアドオン対応のFirefox専用です。  
-* 本アドオンを有効化したときはオリジナル版を無効化または削除して下さい。  
+* 本アドオンを有効にしたときはオリジナル版を無効にするか削除して下さい。  
 * オリジナル版とは別アドオンなので設定は初期値に戻ります。  
   再度設定をお願い致します。  
 * オリジナル版のAMO\(addons.mozilla.org\)での名称と本アドオンの名称が異なるのは、オリジナル版のアドオン内に登録された名称（アドオンマネージャー\(about:addons\)に表示される名称）に合わせているためです。  
 * [futaba\_catalog\_mod（モダンバージョン）](https://userstyles.org/styles/114129/futaba-catalog-mod-modern)使用時に既読マークが付かないときは開いたスレのスタイルの末尾に"!important"を追記して下さい。  
 
 ## 更新履歴
+* v1.2.2 2018-06-29
+  - フレーム表示のカタログで動作するように修正
 * v1.2.1 2018-03-31
   - 起動時にオプションの保持時間の設定値が読み込めていない不具合を修正
 * v1.2.0 2018-03-31
