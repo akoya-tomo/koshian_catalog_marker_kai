@@ -8,6 +8,10 @@ const DEFAULT_RESPONSE_INCREASE_SIZE = 12;
 const MID_REQUEST_CATALOG_UPDATE = 0x11;
 const MID_NOTIFY_OPENED_THREAD_TO_CAT = 0x12;
 let oldMarkCount = DEFAULT_OLD_MARK_COUNT;
+let oldColor = DEFAULT_OLD_COLOR;
+let openedColor = DEFAULT_OPENED_COLOR;
+let oldOpenedColor = DEFAULT_OLD_OPENED_COLOR;
+let frameThickness = DEFAULT_FRAME_THICKNESS;
 
 function onError(e) {
 }
@@ -36,6 +40,7 @@ function main() {
                 let cur = curThreadList.item(j);
                 if (cur.href == sorted.href) {
                     cur.parentElement.setAttribute("old", "true");
+                    if (cur.parentElement.getAttribute("opened") == "true") cur.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
                     break;
                 }
             }
@@ -59,7 +64,12 @@ function main() {
             let anchor = anchorList.item(i);
             if (message.url == anchor.href) {
                 anchor.parentElement.setAttribute("opened", "true");
-                break;
+                if (anchor.parentElement.getAttribute("old") == "true") {
+                    anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
+                } else {
+                    anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + openedColor;
+                }
+            break;
             }
         }
     });
@@ -111,6 +121,13 @@ function main() {
             }
 
             td.setAttribute("opened", `${data.opened}`);
+            if (data.opened) {
+                if (td.getAttribute("old") == "true") {
+                    td.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
+                } else {
+                    td.style.cssText += "border: solid " + frameThickness + " " + openedColor;
+                }
+            }
         }
     }, onError);
 }
@@ -127,6 +144,10 @@ browser.storage.local.get().then((result) => {
     document.documentElement.style.setProperty("--frame-thickness", `${getValueSafely(result.frameThickness, DEFAULT_FRAME_THICKNESS)}px`);
     document.documentElement.style.setProperty("--response-increase-color", getValueSafely(result.responseIncreaseColor, DEFAULT_RESPONSE_INCREASE_COLOR));
     document.documentElement.style.setProperty("--response-increase-size", `${getValueSafely(result.responseIncreaseSize, DEFAULT_RESPONSE_INCREASE_SIZE)}px`);
+    oldColor = getValueSafely(result.oldColor, DEFAULT_OLD_COLOR);
+    openedColor = getValueSafely(result.openedColor, DEFAULT_OPENED_COLOR);
+    oldOpenedColor = getValueSafely(result.oldOpenedColor, DEFAULT_OLD_OPENED_COLOR);
+    frameThickness = `${getValueSafely(result.frameThickness, DEFAULT_FRAME_THICKNESS)}px`;
 
     main();
 }, onError);
