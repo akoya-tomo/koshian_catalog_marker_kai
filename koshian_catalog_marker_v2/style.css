@@ -1,0 +1,29 @@
+:root{
+    --old-color: #cc3333;
+    --opened-color: #660099;
+    --old-opened-color: #339933;
+    --frame-thickness: 4px;
+    --response-increase-color: #cc3333;
+    --response-increase-size: 12px;
+}
+
+[old="true"]{
+    border: solid;
+    border-color: var(--old-color);
+    border-width: var(--frame-thickness);
+}
+
+[opened="true"]{
+    border: solid;
+    border-color: var(--opened-color);
+    border-width: var(--frame-thickness);
+}
+
+[old="true"][opened="true"]{
+    border-color: var(--old-opened-color);
+}
+
+.KOSHIAN_response_increase{
+    color: var(--response-increase-color);
+    font-size: var(--response-increase-size);
+}
