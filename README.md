@@ -3,7 +3,7 @@
 [futaba thread highlighter K](https://greasyfork.org/ja/scripts/36639-futaba-thread-highlighter-k/)の既読スレピックアップに対応するようにオリジナル版から変更しています。  
 
 ※このアドオンはWebExtensionアドオン対応のFirefox専用となります。  
-※他のKOSHIAN改変版などのふたば支援ツールは[こちら](https://github.com/akoya-tomo/futaba_auto_reloader_K/wiki/)。  
+※他のKOSHIAN改変版などのふたば閲覧支援ツールは[こちら](https://github.com/akoya-tomo/futaba_auto_reloader_K/wiki/)。  
 
 ## 機能
 * オリジナルの機能（KOSHIAN カタログマーカー）
@@ -15,7 +15,7 @@
 
 ## インストール
 **GitHub**  
-[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.0.0/koshian_catalog_marker_kai-2.0.0-an.fx.xpi)
+[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.0.1/koshian_catalog_marker_kai-2.0.1-an.fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
@@ -46,6 +46,8 @@
   - 現時点では仕様となります。カタログを更新すると開いたスレにマークが表示されます。  
 
 ## 更新履歴
+* v2.0.1 2018-07-05
+  - 記憶するスレの数が設定値を超えたときに超過分だけ破棄するように修正
 * v2.0.0 2018-07-02
   - ベースをKOSHIAN カタログマーカー v2.0.1に変更
   - futaba thread highlighter Kの既読スレピックアップに対応
