@@ -86,7 +86,7 @@ function onRequestCatalogUpdate(requestDataList, response) {
     }
 
     if(dataList.length > maxDataNum){
-        dataList.splice(0, maxDataNum);
+        dataList.splice(0, (dataList.length - maxDataNum));
     }
     
     response({
