@@ -8,10 +8,13 @@
 ## 機能
 * オリジナルの機能（KOSHIAN カタログマーカー）
   - カタログ画面で開いたスレをマークしたりレス数の増加を表示します。
+    <img src="images/screenshot01.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
   - \(New\) カタログ画面で古いスレをマークします。（デフォルト：10スレ）
+    <img src="images/screenshot02.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
 * 変更された機能（KOSHIAN カタログマーカー 改）
   - [futaba thread highlighter K](https://greasyfork.org/ja/scripts/36639-futaba-thread-highlighter-k/)の既読スレピックアップに対応  
-    futaba threadhighlighter Kで既読スレをピックアップできるように変更しました。  
+    futaba thread highlighter Kで既読スレをピックアップできるように変更しました。  
+    <img src="images/screenshot03.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
 
 ## インストール
 **GitHub**  
