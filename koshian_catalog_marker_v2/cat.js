@@ -16,7 +16,7 @@ let frameThickness = DEFAULT_FRAME_THICKNESS;
 function onError(e) {
 }
 
-function main() {
+function main(reload = false) {
     if(window.location.search.indexOf("cat") < 0){
         return;
     }
@@ -54,25 +54,27 @@ function main() {
     //
     // listen thread opened
     //
-    browser.runtime.onMessage.addListener((message, sender, response) => {
-        if (message.id != MID_NOTIFY_OPENED_THREAD_TO_CAT) {
-            return;
-        }
-
-        let anchorList = document.getElementsByTagName("table").item(1).getElementsByTagName("a");
-        for (let i = 0; i < anchorList.length; ++i) {
-            let anchor = anchorList.item(i);
-            if (message.url == anchor.href) {
-                anchor.parentElement.setAttribute("opened", "true");
-                if (anchor.parentElement.getAttribute("old") == "true") {
-                    anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
-                } else {
-                    anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + openedColor;
-                }
-            break;
+    if (!reload) {
+        browser.runtime.onMessage.addListener((message, sender, response) => {
+            if (message.id != MID_NOTIFY_OPENED_THREAD_TO_CAT) {
+                return;
             }
-        }
-    });
+
+            let anchorList = document.getElementsByTagName("table").item(1).getElementsByTagName("a");
+            for (let i = 0; i < anchorList.length; ++i) {
+                let anchor = anchorList.item(i);
+                if (message.url == anchor.href) {
+                    anchor.parentElement.setAttribute("opened", "true");
+                    if (anchor.parentElement.getAttribute("old") == "true") {
+                        anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
+                    } else {
+                        anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + openedColor;
+                    }
+                break;
+                }
+            }
+        });
+    }
 
     //
     // url,レス数のリストを作る
@@ -151,3 +153,7 @@ browser.storage.local.get().then((result) => {
 
     main();
 }, onError);
+
+document.addEventListener("KOSHIAN_cat_reload", () => {
+    main(true);
+});
