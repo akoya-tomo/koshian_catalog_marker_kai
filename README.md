@@ -7,18 +7,19 @@
 
 ## 機能
 * オリジナルの機能（KOSHIAN カタログマーカー）
-  - カタログ画面で開いたスレをマークしたりレス数の増加を表示します。
+  - カタログ画面で開いたスレをマークしたりレス数の増加を表示します。  
     <img src="images/screenshot01.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
-  - \(New\) カタログ画面で古いスレをマークします。（デフォルト：10スレ）
+  - カタログ画面で古いスレをマークします。（デフォルト：10スレ）  
     <img src="images/screenshot02.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
 * 変更された機能（KOSHIAN カタログマーカー 改）
   - [futaba thread highlighter K](https://greasyfork.org/ja/scripts/36639-futaba-thread-highlighter-k/)の既読スレピックアップに対応  
     futaba thread highlighter Kで既読スレをピックアップできるように変更しました。  
     <img src="images/screenshot03.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
+  - ![\(New\)](images/new.png "New") [KOSHIAN リロード拡張 改](https://github.com/akoya-tomo/koshian_reload_futaba_kai/)のページ更新無しでのカタログリロードに対応  
 
 ## インストール
 **GitHub**  
-[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.0.1/koshian_catalog_marker_kai-2.0.1-an.fx.xpi)
+[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.0.2/koshian_catalog_marker_kai-2.0.2-fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
@@ -49,6 +50,8 @@
   - 現時点では仕様となります。カタログを更新すると開いたスレにマークが表示されます。  
 
 ## 更新履歴
+* v2.0.2 2019-05-17
+  - KOSHIAN リロード拡張 改のページ更新無しでのカタログリロードに対応
 * v2.0.1 2018-07-05
   - 記憶するスレの数が設定値を超えたときに超過分だけ破棄するように修正
 * v2.0.0 2018-07-02
