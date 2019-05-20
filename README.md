@@ -1,6 +1,6 @@
 ## <sub><img src="koshian_catalog_marker_v2/icons/icon-48.png"></sub> KOSHIAN カタログマーカー 改
 このFirefoxアドオンはふたば☆ちゃんねるのカタログ画面で開いたスレをマークしたりレス数の増加を表示する[Pachira](https://addons.mozilla.org/ja/firefox/user/anonymous-a0bba9187b568f98732d22d51c5955a6/)氏の[KOSHIAN カタログマーカー](https://addons.mozilla.org/ja/firefox/addon/koshian-catalog-marker/)の非公式改変版です。  
-[futaba thread highlighter K](https://greasyfork.org/ja/scripts/36639-futaba-thread-highlighter-k/)の既読スレピックアップに対応するようにオリジナル版から変更しています。  
+[KOSHIAN リロード拡張 改](https://github.com/akoya-tomo/koshian_reload_futaba_kai/)のページ更新無しでのカタログリロードや[futaba thread highlighter K](https://greasyfork.org/ja/scripts/36639-futaba-thread-highlighter-k/)の既読スレピックアップに対応するようにオリジナル版から変更しています。  
 
 ※このアドオンはWebExtensionアドオン対応のFirefox専用となります。  
 ※他のKOSHIAN改変版などのふたば閲覧支援ツールは[こちら](https://github.com/akoya-tomo/futaba_auto_reloader_K/wiki/)。  
@@ -15,11 +15,15 @@
   - [futaba thread highlighter K](https://greasyfork.org/ja/scripts/36639-futaba-thread-highlighter-k/)の既読スレピックアップに対応  
     futaba thread highlighter Kで既読スレをピックアップできるように変更しました。  
     <img src="images/screenshot03.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
-  - ![\(New\)](images/new.png "New") [KOSHIAN リロード拡張 改](https://github.com/akoya-tomo/koshian_reload_futaba_kai/)のページ更新無しでのカタログリロードに対応  
+  - [KOSHIAN リロード拡張 改](https://github.com/akoya-tomo/koshian_reload_futaba_kai/)のページ更新無しでのカタログリロードに対応  
+  - ![\(New\)](images/new.png "New") カタログをレス増加順にソートする機能  
+    KOSHIAN リロード拡張 改のオプションから「カタログをレス増加順にソートする」を有効にするとレス増加順に並べることができます。  
+    但し、KOSHIAN リロード拡張 改のリロード機能のときだけソートされ、ブラウザでページ更新したときはソートされません。  
+  - ![\(New\)](images/new.png "New") 新着スレを「New」で表示  
 
 ## インストール
 **GitHub**  
-[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.0.2/koshian_catalog_marker_kai-2.0.2-fx.xpi)
+[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.1.0/koshian_catalog_marker_kai-2.1.0-fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
@@ -47,9 +51,12 @@
 
 ## 既知の問題
 * フレーム表示のカタログでスレを開いたときに既読マークが付かない。  
-  - 現時点では仕様となります。カタログを更新すると開いたスレにマークが表示されます。  
+  - 現時点では仕様となります。カタログをページ更新すると開いたスレにマークが表示されます。  
 
 ## 更新履歴
+* v2.1.0 2019-05-20
+  - レス増加順ソート機能を追加（要 KOSHIAN リロード拡張 改）
+  - 新着スレに「New」を表示するように修正
 * v2.0.2 2019-05-17
   - KOSHIAN リロード拡張 改のページ更新無しでのカタログリロードに対応
 * v2.0.1 2018-07-05
