@@ -14,6 +14,8 @@ let oldOpenedColor = DEFAULT_OLD_OPENED_COLOR;
 let frameThickness = DEFAULT_FRAME_THICKNESS;
 
 function onError(e) {
+    //console.log("KOSHIAN_catalog_marker/cat.js error:");
+    //console.dir(e);
 }
 
 function main(reload = false, sort = false, undo = false) {

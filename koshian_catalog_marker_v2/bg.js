@@ -27,6 +27,8 @@ ResponseData{
 */
 
 function onError(e) {
+    //console.log("KOSHIAN_catalog_marker/bg.js error:");
+    //console.dir(e);
 }
 
 function onThreadOpened(host, url) {
