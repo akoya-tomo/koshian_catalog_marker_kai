@@ -55,8 +55,20 @@ function onThreadOpened(host, url) {
         }, onError);
 }
 
-function onRequestCatalogUpdate(requestDataList, response) {
+let undoDataList = [];
+let previousDataList = [];
+
+function onRequestCatalogUpdate(requestDataList, undo, response) {
     let responseDataList = [];
+
+    // UNDO用にdataListを保存
+    if (undo) {
+        dataList = JSON.parse(JSON.stringify(undoDataList));
+        previousDataList = JSON.parse(JSON.stringify(dataList));
+    } else {
+        undoDataList = JSON.parse(JSON.stringify(previousDataList));
+        previousDataList = JSON.parse(JSON.stringify(dataList));
+    }
 
     for(let i = 0; i < requestDataList.length; ++i){
         let requestData = requestDataList[i];
@@ -77,11 +89,13 @@ function onRequestCatalogUpdate(requestDataList, response) {
                 opened: false
             });
 
-            dataList.push({
-                url: requestData.url,
-                count: requestData.count,
-                opened: false
-            });
+            if (requestData.url) {
+                dataList.push({
+                    url: requestData.url,
+                    count: requestData.count,
+                    opened: false
+                });
+            }
         }
     }
 
@@ -98,7 +112,7 @@ function main() {
     browser.runtime.onMessage.addListener((message, sender, response) => {
         switch (message.id) {
             case MID_REQUEST_CATALOG_UPDATE:
-                onRequestCatalogUpdate(message.dataList, response);
+                onRequestCatalogUpdate(message.dataList, message.undo, response);
                 break;
             case MID_NOTIFY_OPENED_THREAD_TO_BG:
                 onThreadOpened(message.host, message.url);
