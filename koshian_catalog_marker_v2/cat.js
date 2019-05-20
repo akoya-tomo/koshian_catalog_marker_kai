@@ -14,12 +14,18 @@ let oldOpenedColor = DEFAULT_OLD_OPENED_COLOR;
 let frameThickness = DEFAULT_FRAME_THICKNESS;
 
 function onError(e) {
+    //console.log("KOSHIAN_catalog_marker/cat.js error:");
+    //console.dir(e);
 }
 
-function main(reload = false) {
+function main(reload = false, sort = false, undo = false) {
     if(window.location.search.indexOf("cat") < 0){
         return;
     }
+    let cattable = document.getElementById("cattable") || document.querySelector('body > table[border="1"]');
+    if (!cattable) return;
+
+    document.body.setAttribute("__KOSHIAN_catalog_sort", "true");   // KOSHIAN リロード拡張 改へカタログソート可を通知
 
     //
     // 古い順のスレッドリストを取得
@@ -32,8 +38,9 @@ function main(reload = false) {
             return;
         }
 
-        let curThreadList = document.getElementsByTagName("table").item(1).getElementsByTagName("a");
-        let sortedThreadList = xml.responseXML.getElementsByTagName("table").item(1).getElementsByTagName("a");
+        let curThreadList = cattable.getElementsByTagName("a");
+        let sortedCattable = xml.responseXML.getElementById("cattable") || xml.responseXML.querySelector('body > table[border="1"]')
+        let sortedThreadList = sortedCattable.getElementsByTagName("a");
         for (let i = 0; i < Math.min(oldMarkCount, sortedThreadList.length); ++i) {
             let sorted = sortedThreadList.item(i);
             for (let j = 0; j < curThreadList.length; ++j) {
@@ -60,7 +67,7 @@ function main(reload = false) {
                 return;
             }
 
-            let anchorList = document.getElementsByTagName("table").item(1).getElementsByTagName("a");
+            let anchorList = cattable.getElementsByTagName("a");
             for (let i = 0; i < anchorList.length; ++i) {
                 let anchor = anchorList.item(i);
                 if (message.url == anchor.href) {
@@ -79,12 +86,14 @@ function main(reload = false) {
     //
     // url,レス数のリストを作る
     //
-    let tdList = document.getElementsByTagName("table").item(1).getElementsByTagName("td");
+    let tdList = cattable.getElementsByTagName("td");
     let requestDataList = [];
     for (let i = 0; i < tdList.length; ++i) {
         let td = tdList.item(i);
-        let url = td.getElementsByTagName("a").item(0).href;
-        let count = Number(td.getElementsByTagName("font").item(0).textContent);
+        let anchors = td.getElementsByTagName("a");
+        let url = anchors.length ? anchors.item(0).href : null;
+        let fonts = td.getElementsByTagName("font");
+        let count = fonts.length ? Number(fonts.item(0).textContent) : 0;
 
         requestDataList.push({
             url: url,
@@ -93,13 +102,29 @@ function main(reload = false) {
         });
     }
 
+    if (requestDataList.length == 1 && requestDataList[0].url === null) {
+        // カタログにスレが無い
+        if (sort) {
+            resetOpacity(cattable);
+        }
+        return;
+    }
+
+    let sortList = [];
+
     browser.runtime.sendMessage({
         id: MID_REQUEST_CATALOG_UPDATE,
-        dataList: requestDataList
+        dataList: requestDataList,
+        undo: undo
     }).then(response => {
         if (response.dataList.length != tdList.length) {
+            if (sort) {
+                resetOpacity(cattable);
+            }
             return;
         }
+
+        let newBoard = response.newBoard;
 
         for (let i = 0; i < tdList.length; ++i) {
             let td = tdList.item(i);
@@ -116,9 +141,12 @@ function main(reload = false) {
                 }
             })();
 
-            if (data.increase > 0) {
-                responseIncrease.textContent = ` +${data.increase}`;
+            if (data.new && !newBoard) {
+                responseIncrease.textContent = " New";
             } else {
+            if (data.increase > 0 && !newBoard) {
+                responseIncrease.textContent = ` +${data.increase}`;
+            } else 
                 responseIncrease.textContent = ``;
             }
 
@@ -130,8 +158,71 @@ function main(reload = false) {
                     td.style.cssText += "border: solid " + frameThickness + " " + openedColor;
                 }
             }
+
+            td.setAttribute("new", `${data.new}`);
+
+            if (sort) {
+                sortList.push({
+                    resInc : data.increase,
+                    tdIndex : i
+                });
+            }
         }
+
+        if (!sort) return;
+        // レス増加順ソート
+        sortList.sort(function (a, b) {
+            return b.resInc - a.resInc;
+        });
+        let trs = cattable.getElementsByTagName("tr");
+        if (!trs) {
+            resetOpacity(cattable);
+            return;
+        }
+        let catColNum = trs[0].getElementsByTagName("td").length;   // カタログの一行当たりのスレ数
+
+        let newTbody = document.createElement("tbody");
+        let index = 0;
+        for (let i = 0; i < trs.length; ++i) {
+            let newTr = document.createElement("tr");
+            for (let j = 0; j < catColNum; ++j) {
+                newTr.appendChild(tdList[sortList[index].tdIndex].cloneNode(true));
+                ++index;
+                if (index >= sortList.length) break;
+            }
+            newTbody.appendChild(newTr);
+        }
+        cattable.textContent = null; // カタログテーブルの子要素を全削除
+        cattable.appendChild(newTbody);
+
+        document.dispatchEvent(new CustomEvent("KOSHIAN_cat_reload", {
+            detail: {
+                sorted: true
+            }
+        }));
+
     }, onError);
+}
+
+/**
+ * カタログtableのtbodyの透明度を元に戻す
+ * @param {HTMLElement} cattable カタログのtable要素
+ */
+function resetOpacity(cattable) {
+    let tbody = cattable.firstChild;
+    if (tbody) {
+        // tbodyのプロパティにアクセスするためにcloneに書換
+        let tbodyClone = tbody.cloneNode(true);
+        cattable.textContent = null;    // カタログテーブルの子要素を全削除
+        cattable.append(tbodyClone);
+        tbodyClone.style.opacity = 1;
+    }
+
+    document.dispatchEvent(new CustomEvent("KOSHIAN_cat_reload", {
+        detail: {
+            sorted: true
+        }
+    }));
 }
 
 function getValueSafely(value, default_value) {
@@ -154,6 +245,15 @@ browser.storage.local.get().then((result) => {
     main();
 }, onError);
 
-document.addEventListener("KOSHIAN_cat_reload", () => {
+document.addEventListener("KOSHIAN_cat_reload", (e) => {
+    if (e.detail && e.detail.sorted) return;    // ソート後の呼び出しは無視
     main(true);
+});
+
+document.addEventListener("KOSHIAN_cat_sort", (e) => {
+    if (e.detail) {
+        main(true, true, true); // UNDO処理
+    } else {
+        main(true, true);   // ソート処理
+    }
 });
