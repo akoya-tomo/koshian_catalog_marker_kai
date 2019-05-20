@@ -122,6 +122,8 @@ function main(reload = false, sort = false, undo = false) {
             return;
         }
 
+        let newBoard = response.newBoard;
+
         for (let i = 0; i < tdList.length; ++i) {
             let td = tdList.item(i);
             let data = response.dataList[i];
@@ -137,9 +139,12 @@ function main(reload = false, sort = false, undo = false) {
                 }
             })();
 
-            if (data.increase > 0) {
-                responseIncrease.textContent = ` +${data.increase}`;
+            if (data.new && !newBoard) {
+                responseIncrease.textContent = " New";
             } else {
+            if (data.increase > 0 && !newBoard) {
+                responseIncrease.textContent = ` +${data.increase}`;
+            } else 
                 responseIncrease.textContent = ``;
             }
 
@@ -151,6 +156,8 @@ function main(reload = false, sort = false, undo = false) {
                     td.style.cssText += "border: solid " + frameThickness + " " + openedColor;
                 }
             }
+
+            td.setAttribute("new", `${data.new}`);
 
             if (sort) {
                 sortList.push({

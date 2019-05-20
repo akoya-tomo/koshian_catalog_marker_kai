@@ -5,6 +5,7 @@ const MID_NOTIFY_OPENED_THREAD_TO_BG = 0x21;
 const DEFAULT_MAX_DATA_NUM = 1024;
 let maxDataNum = DEFAULT_MAX_DATA_NUM;
 let dataList = [];
+let boardList = [];
 
 /*
 ThreadData{
@@ -21,6 +22,7 @@ RequestData{
 ResponseData{
     increase,
     opened,
+    new
 }
 */
 
@@ -61,6 +63,17 @@ let previousDataList = [];
 function onRequestCatalogUpdate(requestDataList, undo, response) {
     let responseDataList = [];
 
+    // 初めて開いた板か
+    let newBoard = false;
+    let requestDataBoard = requestDataList[0].url ? requestDataList[0].url.match(/^https?:\/\/([^.]+\.2chan.net\/[^/]+\/)res\/\d+\.htm$/) : [null, null];
+    let board = boardList.find((board) => {
+        return board == requestDataBoard[1];
+    });
+    if (!board) {
+        newBoard = true;
+        boardList.push(requestDataBoard[1]);
+    }
+
     // UNDO用にdataListを保存
     if (undo) {
         dataList = JSON.parse(JSON.stringify(undoDataList));
@@ -79,14 +92,16 @@ function onRequestCatalogUpdate(requestDataList, undo, response) {
         if(data){
             responseDataList.push({
                 increase: requestData.count - data.count,
-                opened: data.opened
+                opened: data.opened,
+                new: false
             });
 
             data.count = requestData.count;
         }else{
             responseDataList.push({
-                increase: 0,
-                opened: false
+                increase: requestData.count,
+                opened: false,
+                new: true
             });
 
             if (requestData.url) {
@@ -104,7 +119,8 @@ function onRequestCatalogUpdate(requestDataList, undo, response) {
     }
     
     response({
-        dataList: responseDataList
+        dataList: responseDataList,
+        newBoard: newBoard
     });
 }
 
