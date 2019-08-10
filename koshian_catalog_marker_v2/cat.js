@@ -1,6 +1,6 @@
 const DEFAULT_OLD_MARK_COUNT = 10;
 const DEFAULT_OLD_COLOR = "#cc3333";
-const DEFAULT_OPENED_COLOR = "#660099"
+const DEFAULT_OPENED_COLOR = "#660099";
 const DEFAULT_OLD_OPENED_COLOR = "#339933";
 const DEFAULT_FRAME_THICKNESS = 4;
 const DEFAULT_RESPONSE_INCREASE_COLOR = "#cc3333";
@@ -13,7 +13,7 @@ let openedColor = DEFAULT_OPENED_COLOR;
 let oldOpenedColor = DEFAULT_OLD_OPENED_COLOR;
 let frameThickness = DEFAULT_FRAME_THICKNESS;
 
-function onError(e) {
+function onError(e) {   // eslint-disable-line no-unused-vars
     //console.log("KOSHIAN_catalog_marker/cat.js error:");
     //console.dir(e);
 }
@@ -23,7 +23,9 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
         return;
     }
     let cattable = document.getElementById("cattable") || document.querySelector('body > table[border="1"]');
-    if (!cattable) return;
+    if (!cattable) {
+        return;
+    }
 
     document.body.setAttribute("__KOSHIAN_catalog_sort", "true");   // KOSHIAN リロード拡張 改へカタログソート可を通知
 
@@ -33,13 +35,13 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
     let xml = new XMLHttpRequest();
     xml.open("GET", `${window.location.protocol + "//" + window.location.host + window.location.pathname + "?mode=cat&sort=2"}`);
     xml.responseType = "document";
-    xml.onload = (e) => {
+    xml.onload = (e) => {   // eslint-disable-line no-unused-vars
         if (xml.status != 200) {
             return;
         }
 
         let curThreadList = cattable.getElementsByTagName("a");
-        let sortedCattable = xml.responseXML.getElementById("cattable") || xml.responseXML.querySelector('body > table[border="1"]')
+        let sortedCattable = xml.responseXML.getElementById("cattable") || xml.responseXML.querySelector('body > table[border="1"]');
         let sortedThreadList = sortedCattable.getElementsByTagName("a");
         for (let i = 0; i < Math.min(oldMarkCount, sortedThreadList.length); ++i) {
             let sorted = sortedThreadList.item(i);
@@ -47,7 +49,9 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
                 let cur = curThreadList.item(j);
                 if (cur.href == sorted.href) {
                     cur.parentElement.setAttribute("old", "true");
-                    if (cur.parentElement.getAttribute("opened") == "true") cur.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
+                    if (cur.parentElement.getAttribute("opened") == "true") {
+                        cur.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
+                    }
                     break;
                 }
             }
@@ -77,9 +81,10 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
                     } else {
                         anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + openedColor;
                     }
-                break;
+                    break;
                 }
             }
+            response();
         });
     }
 
@@ -144,10 +149,9 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
 
             if (data.new && !newBoard) {
                 responseIncrease.textContent = " New";
-            } else {
-            if (data.increase > 0 && !newBoard) {
+            } else if (data.increase > 0 && !newBoard) {
                 responseIncrease.textContent = ` +${data.increase}`;
-            } else 
+            } else {
                 responseIncrease.textContent = ``;
             }
 
@@ -256,7 +260,10 @@ browser.storage.local.get().then((result) => {
 }, onError);
 
 document.addEventListener("KOSHIAN_cat_reload", (e) => {
-    if (e.detail && e.detail.sorted) return;    // ソート後の呼び出しは無視
+    if (e.detail && e.detail.sorted) {
+        // ソート後の呼び出しは無視
+        return;
+    }
     main(true);
 });
 

@@ -25,7 +25,7 @@ ResponseData{
 }
 */
 
-function onError(e) {
+function onError(e) {   // eslint-disable-line no-unused-vars
     //console.log("KOSHIAN_catalog_marker/bg.js error:");
     //console.dir(e);
 }
@@ -52,7 +52,7 @@ function onThreadOpened(host, url) {
             url: url,
             count: 0,
             opened: true
-        })
+        });
     }
 
     browser.tabs.query({ currentWindow: true })
@@ -143,7 +143,7 @@ function onRequestCatalogUpdate(requestDataList, undo, reorder, response) {
     if(dataList[name].length > maxDataNum){
         dataList[name].splice(0, (dataList[name].length - maxDataNum));
     }
-    
+
     response({
         dataList: responseDataList,
         newBoard: isNewBoard
@@ -173,7 +173,7 @@ browser.storage.onChanged.addListener((changes, areaName) => {
         return;
     }
 
-    maxDataNum = safeGetValue(changes.maxDataNum.newValue, DEFAULT_MAX_DATA_NUM);
+    maxDataNum = getValueSafely(changes.maxDataNum.newValue, DEFAULT_MAX_DATA_NUM);
 });
 
 browser.storage.local.get().then((result) => {

@@ -1,11 +1,13 @@
 const DEFAULT_OLD_MARK_COUNT = 10;
 const DEFAULT_OLD_COLOR = "#cc3333";
-const DEFAULT_OPENED_COLOR = "#660099"
+const DEFAULT_OPENED_COLOR = "#660099";
 const DEFAULT_OLD_OPENED_COLOR = "#339933";
 const DEFAULT_FRAME_THICKNESS = 4;
 const DEFAULT_RESPONSE_INCREASE_COLOR = "#cc3333";
 const DEFAULT_RESPONSE_INCREASE_SIZE = 12;
 const DEFAULT_MAX_DATA_NUM = 1024;
+
+/* eslint indent: ["warn", 2] */
 
 function getValueSafely(value, default_value) {
   if (value === undefined) {
@@ -41,7 +43,7 @@ function setCurrentChoice(result) {
   document.querySelector("#max_data_num").value = getValueSafely(result.maxDataNum, DEFAULT_MAX_DATA_NUM);
 }
 
-function onError(error) {
+function onError(error) { // eslint-disable-line no-unused-vars
 }
 
 function restoreOptions() {
