@@ -4,8 +4,7 @@ const MID_NOTIFY_OPENED_THREAD_TO_CAT = 0x12;
 const MID_NOTIFY_OPENED_THREAD_TO_BG = 0x21;
 const DEFAULT_MAX_DATA_NUM = 1024;
 let maxDataNum = DEFAULT_MAX_DATA_NUM;
-let dataList = [];
-let boardList = [];
+let dataList = {};
 
 /*
 ThreadData{
@@ -26,24 +25,34 @@ ResponseData{
 }
 */
 
-function onError(e) {
+function onError(e) {   // eslint-disable-line no-unused-vars
     //console.log("KOSHIAN_catalog_marker/bg.js error:");
     //console.dir(e);
 }
 
 function onThreadOpened(host, url) {
-    let data = dataList.find((elem) => {
+    let name = null;
+    let match = url.match(/^https?:\/\/([^.]+)\.2chan.net\/([^/]+)\/res\/\d+\.htm$/);
+    if (match) {
+        name = `${match[1]}_${match[2]}`;
+    } else {
+        return;
+    }
+    if (!dataList[name]) {
+        dataList[name] = [];
+    }
+    let data = dataList[name].find((elem) => {
         return elem.url == url;
     });
 
     if(data){
         data.opened = true;
     }else{
-        dataList.push({
+        dataList[name].push({
             url: url,
             count: 0,
             opened: true
-        })
+        });
     }
 
     browser.tabs.query({ currentWindow: true })
@@ -59,35 +68,50 @@ function onThreadOpened(host, url) {
         }, onError);
 }
 
-let undoDataList = [];
-let previousDataList = [];
+let undoDataList = {};
+let previousDataList = {};
 
-function onRequestCatalogUpdate(requestDataList, undo, response) {
+function onRequestCatalogUpdate(requestDataList, undo, reorder, response) {
     let responseDataList = [];
 
-    // 初めて開いた板か
-    let newBoard = false;
-    let requestDataBoard = requestDataList[0].url ? requestDataList[0].url.match(/^https?:\/\/([^.]+\.2chan.net\/[^/]+\/)res\/\d+\.htm$/) : [null, null];
-    let board = boardList.find((board) => {
-        return board == requestDataBoard[1];
-    });
-    if (!board) {
-        newBoard = true;
-        boardList.push(requestDataBoard[1]);
+    let isNewBoard = false;
+    let name = null;
+    if (requestDataList[0].url) {
+        let match = requestDataList[0].url.match(/^https?:\/\/([^.]+)\.2chan.net\/([^/]+)\/res\/\d+\.htm$/);
+        if (match) {
+            name = `${match[1]}_${match[2]}`;
+        } else {
+            response({
+                dataList: responseDataList,
+                newBoard: false
+            });
+            return;
+        }
+        if (!dataList[name]) {
+            dataList[name] = [];
+            isNewBoard = true;
+        }
     }
 
-    // UNDO用にdataListを保存
     if (undo) {
-        dataList = JSON.parse(JSON.stringify(undoDataList));
-        previousDataList = JSON.parse(JSON.stringify(dataList));
+        // UNDO
+        dataList[name] = undoDataList[name] ? JSON.parse(JSON.stringify(undoDataList[name])) : [];
+        previousDataList[name] = JSON.parse(JSON.stringify(dataList[name]));
+        if (dataList[name].length === 0) {
+            isNewBoard = true;
+        }
+    } else if (reorder) {
+        // [通常順][増加順]切り替え
+        dataList[name] = previousDataList[name] ? JSON.parse(JSON.stringify(previousDataList[name])) : [];
     } else {
-        undoDataList = JSON.parse(JSON.stringify(previousDataList));
-        previousDataList = JSON.parse(JSON.stringify(dataList));
+        // dataListを保存
+        undoDataList[name] = previousDataList[name] ? JSON.parse(JSON.stringify(previousDataList[name])) : [];
+        previousDataList[name] = JSON.parse(JSON.stringify(dataList[name]));
     }
 
     for(let i = 0; i < requestDataList.length; ++i){
         let requestData = requestDataList[i];
-        let data = dataList.find((elem) => {
+        let data = dataList[name].find((elem) => {
             return elem.url == requestData.url;
         });
 
@@ -106,8 +130,8 @@ function onRequestCatalogUpdate(requestDataList, undo, response) {
                 new: true
             });
 
-            if (requestData.url) {
-                dataList.push({
+            if (requestData.url && !reorder) {
+                dataList[name].push({
                     url: requestData.url,
                     count: requestData.count,
                     opened: false
@@ -116,13 +140,13 @@ function onRequestCatalogUpdate(requestDataList, undo, response) {
         }
     }
 
-    if(dataList.length > maxDataNum){
-        dataList.splice(0, (dataList.length - maxDataNum));
+    if(dataList[name].length > maxDataNum){
+        dataList[name].splice(0, (dataList[name].length - maxDataNum));
     }
-    
+
     response({
         dataList: responseDataList,
-        newBoard: newBoard
+        newBoard: isNewBoard
     });
 }
 
@@ -130,7 +154,7 @@ function main() {
     browser.runtime.onMessage.addListener((message, sender, response) => {
         switch (message.id) {
             case MID_REQUEST_CATALOG_UPDATE:
-                onRequestCatalogUpdate(message.dataList, message.undo, response);
+                onRequestCatalogUpdate(message.dataList, message.undo, message.reorder, response);
                 break;
             case MID_NOTIFY_OPENED_THREAD_TO_BG:
                 onThreadOpened(message.host, message.url);
@@ -149,7 +173,7 @@ browser.storage.onChanged.addListener((changes, areaName) => {
         return;
     }
 
-    maxDataNum = safeGetValue(changes.maxDataNum.newValue, DEFAULT_MAX_DATA_NUM);
+    maxDataNum = getValueSafely(changes.maxDataNum.newValue, DEFAULT_MAX_DATA_NUM);
 });
 
 browser.storage.local.get().then((result) => {

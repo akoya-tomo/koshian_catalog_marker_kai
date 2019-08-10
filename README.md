@@ -16,14 +16,14 @@
     futaba thread highlighter Kで既読スレをピックアップできるように変更しました。  
     <img src="images/screenshot03.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
   - [KOSHIAN リロード拡張 改](https://github.com/akoya-tomo/koshian_reload_futaba_kai/)のページ更新無しでのカタログリロードに対応  
-  - ![\(New\)](images/new.png "New") カタログをレス増加順にソートする機能  
-    KOSHIAN リロード拡張 改のオプションから「カタログをレス増加順にソートする」を有効にするとレス増加順に並べることができます。  
-    但し、KOSHIAN リロード拡張 改のリロード機能のときだけソートされ、ブラウザでページ更新したときはソートされません。  
-  - ![\(New\)](images/new.png "New") 新着スレを「New」で表示  
+  - カタログをレス増加順にソートする機能  
+    ![\(New\)](images/new.png "New") KOSHIAN リロード拡張 改と併用した状態で\[増加順\]ボタンを押すとレス増加順に並べることができます。  
+    但し、KOSHIAN リロード拡張 改のリロード動作のときだけソートされ、ブラウザでページ更新したときはソートされません。  
+  - 新着スレを「New」で表示  
 
 ## インストール
 **GitHub**  
-[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.1.0/koshian_catalog_marker_kai-2.1.0-fx.xpi)
+[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.2.0/koshian_catalog_marker_kai-2.2.0-fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
@@ -31,6 +31,7 @@
 * 本アドオンを有効にしたときはオリジナル版を無効にするか削除して下さい。  
 * オリジナル版とは別アドオンなので設定は初期値に戻ります。  
   再度設定をお願い致します。  
+* ![\(New\)](images/new.png "New") KOSHIAN リロード拡張 改と併用時に本アドオンを無効にしたときは開いているカタログを再読み込みしてください。  
 * [futaba\_catalog\_mod（モダンバージョン）](https://userstyles.org/styles/114129/futaba-catalog-mod-modern)使用時にマークが付かないときは、futaba\_catalog\_mod内の  
 
   ```css
@@ -54,6 +55,9 @@
   - 現時点では仕様となります。カタログをページ更新すると開いたスレにマークが表示されます。  
 
 ## 更新履歴
+* v2.2.0 2019-08-10
+  - KOSHIAN リロード拡張 改 v2.3.0の\[通常順\]\[増加順\]切り替えに対応
+  - UNDOしたときに正しいレス増加数が表示されないことがある不具合を修正
 * v2.1.0 2019-05-20
   - レス増加順ソート機能を追加（要 KOSHIAN リロード拡張 改）
   - 新着スレに「New」を表示するように修正
