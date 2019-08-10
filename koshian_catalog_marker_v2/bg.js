@@ -71,7 +71,7 @@ function onThreadOpened(host, url) {
 let undoDataList = {};
 let previousDataList = {};
 
-function onRequestCatalogUpdate(requestDataList, undo, response) {
+function onRequestCatalogUpdate(requestDataList, undo, reorder, response) {
     let responseDataList = [];
 
     let isNewBoard = false;
@@ -100,6 +100,9 @@ function onRequestCatalogUpdate(requestDataList, undo, response) {
         if (dataList[name].length === 0) {
             isNewBoard = true;
         }
+    } else if (reorder) {
+        // [通常順][増加順]切り替え
+        dataList[name] = previousDataList[name] ? JSON.parse(JSON.stringify(previousDataList[name])) : [];
     } else {
         // dataListを保存
         undoDataList[name] = previousDataList[name] ? JSON.parse(JSON.stringify(previousDataList[name])) : [];
@@ -127,7 +130,7 @@ function onRequestCatalogUpdate(requestDataList, undo, response) {
                 new: true
             });
 
-            if (requestData.url) {
+            if (requestData.url && !reorder) {
                 dataList[name].push({
                     url: requestData.url,
                     count: requestData.count,
@@ -151,7 +154,7 @@ function main() {
     browser.runtime.onMessage.addListener((message, sender, response) => {
         switch (message.id) {
             case MID_REQUEST_CATALOG_UPDATE:
-                onRequestCatalogUpdate(message.dataList, message.undo, response);
+                onRequestCatalogUpdate(message.dataList, message.undo, message.reorder, response);
                 break;
             case MID_NOTIFY_OPENED_THREAD_TO_BG:
                 onThreadOpened(message.host, message.url);

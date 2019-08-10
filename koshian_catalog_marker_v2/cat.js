@@ -18,7 +18,7 @@ function onError(e) {
     //console.dir(e);
 }
 
-function main(reload = false, sort = false, undo = false) {
+function main(reload = false, sort = false, undo = false, reorder = false) {
     if(window.location.search.indexOf("cat") < 0){
         return;
     }
@@ -115,7 +115,8 @@ function main(reload = false, sort = false, undo = false) {
     browser.runtime.sendMessage({
         id: MID_REQUEST_CATALOG_UPDATE,
         dataList: requestDataList,
-        undo: undo
+        undo: undo,
+        reorder: reorder
     }).then(response => {
         if (response.dataList.length != tdList.length) {
             if (sort) {
@@ -169,7 +170,12 @@ function main(reload = false, sort = false, undo = false) {
             }
         }
 
-        if (!sort) return;
+        if (!sort) {
+            if (reorder) {
+                resetOpacity(cattable);
+            }
+            return;
+        }
         // レス増加順ソート
         sortList.sort(function (a, b) {
             return b.resInc - a.resInc;
@@ -251,9 +257,13 @@ document.addEventListener("KOSHIAN_cat_reload", (e) => {
 });
 
 document.addEventListener("KOSHIAN_cat_sort", (e) => {
-    if (e.detail) {
+    if (e.detail === true) {
+        // KOSHIAN リロード拡張 改 v2.2.2以前
         main(true, true, true); // UNDO処理
-    } else {
+    } else if (e.detail === false) {
         main(true, true);   // ソート処理
+    } else {
+        // KOSHIAN リロード拡張 改 v2.3.0以降
+        main(true, (e.detail & 1) > 0, (e.detail & 2) > 0, (e.detail & 4) > 0);
     }
 });
