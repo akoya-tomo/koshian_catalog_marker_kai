@@ -217,11 +217,15 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
 function resetOpacity(cattable) {
     let tbody = cattable.firstChild;
     if (tbody) {
-        // tbodyのプロパティにアクセスするためにcloneに書換
-        let tbodyClone = tbody.cloneNode(true);
-        cattable.textContent = null;    // カタログテーブルの子要素を全削除
-        cattable.append(tbodyClone);
-        tbodyClone.style.opacity = 1;
+        try {
+            tbody.style.opacity = 1;
+        } catch (e) {
+            // tbodyのプロパティのアクセスに失敗したときはcloneに書き換える(KOSHIAN リロード拡張 改 v2.2.2以前用)
+            let tbodyClone = tbody.cloneNode(true);
+            cattable.textContent = null;    // カタログテーブルの子要素を全削除
+            cattable.append(tbodyClone);
+            tbodyClone.style.opacity = 1;
+        }
     }
 
     document.dispatchEvent(new CustomEvent("KOSHIAN_cat_reload", {
