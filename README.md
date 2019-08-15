@@ -23,7 +23,7 @@
 
 ## インストール
 **GitHub**  
-[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.2.0/koshian_catalog_marker_kai-2.2.0-fx.xpi)
+[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.2.1/koshian_catalog_marker_kai-2.2.1-fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
@@ -55,6 +55,8 @@
   - 現時点では仕様となります。カタログをページ更新すると開いたスレにマークが表示されます。  
 
 ## 更新履歴
+* v2.2.1 2019-08-16
+  - カタログとスレでURIスキーム(http・https)が異なるときに既読マークが付かない不具合を修正
 * v2.2.0 2019-08-10
   - KOSHIAN リロード拡張 改 v2.3.0の\[通常順\]\[増加順\]切り替えに対応
   - UNDOしたときに正しいレス増加数が表示されないことがある不具合を修正

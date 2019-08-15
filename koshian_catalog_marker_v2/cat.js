@@ -74,7 +74,7 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
             let anchorList = cattable.getElementsByTagName("a");
             for (let i = 0; i < anchorList.length; ++i) {
                 let anchor = anchorList.item(i);
-                if (message.url == anchor.href) {
+                if (anchor.href && message.url == anchor.href.split("://")[1]) {
                     anchor.parentElement.setAttribute("opened", "true");
                     if (anchor.parentElement.getAttribute("old") == "true") {
                         anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
@@ -96,7 +96,7 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
     for (let i = 0; i < tdList.length; ++i) {
         let td = tdList.item(i);
         let anchors = td.getElementsByTagName("a");
-        let url = anchors.length ? anchors.item(0).href : null;
+        let url = anchors.length ? (anchors.item(0).href ? anchors.item(0).href.split("://")[1] : null) : null;
         let fonts = td.getElementsByTagName("font");
         let count = fonts.length ? Number(fonts.item(0).textContent) : 0;
 
@@ -198,7 +198,9 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
             for (let j = 0; j < catColNum; ++j) {
                 newTr.appendChild(tdList[sortList[index].tdIndex].cloneNode(true));
                 ++index;
-                if (index >= sortList.length) break;
+                if (index >= sortList.length) {
+                    break;
+                }
             }
             newTbody.appendChild(newTr);
         }
