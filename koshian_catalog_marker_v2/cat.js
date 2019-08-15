@@ -198,7 +198,9 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
             for (let j = 0; j < catColNum; ++j) {
                 newTr.appendChild(tdList[sortList[index].tdIndex].cloneNode(true));
                 ++index;
-                if (index >= sortList.length) break;
+                if (index >= sortList.length) {
+                    break;
+                }
             }
             newTbody.appendChild(newTr);
         }
