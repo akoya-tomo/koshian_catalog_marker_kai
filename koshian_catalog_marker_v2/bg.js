@@ -32,7 +32,7 @@ function onError(e) {   // eslint-disable-line no-unused-vars
 
 function onThreadOpened(host, url) {
     let name = null;
-    let match = url.match(/^https?:\/\/([^.]+)\.2chan.net\/([^/]+)\/res\/\d+\.htm$/);
+    let match = url.match(/^([^.]+)\.2chan.net\/([^/]+)\/res\/\d+\.htm$/);
     if (match) {
         name = `${match[1]}_${match[2]}`;
     } else {
@@ -77,7 +77,7 @@ function onRequestCatalogUpdate(requestDataList, undo, reorder, response) {
     let isNewBoard = false;
     let name = null;
     if (requestDataList[0].url) {
-        let match = requestDataList[0].url.match(/^https?:\/\/([^.]+)\.2chan.net\/([^/]+)\/res\/\d+\.htm$/);
+        let match = requestDataList[0].url.match(/^([^.]+)\.2chan.net\/([^/]+)\/res\/\d+\.htm$/);
         if (match) {
             name = `${match[1]}_${match[2]}`;
         } else {
