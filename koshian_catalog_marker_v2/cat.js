@@ -1,4 +1,7 @@
+const DEFAULT_USE_OLD_SORT = false;
 const DEFAULT_OLD_MARK_COUNT = 10;
+const DEFAULT_USE_RESPONSE_NUMBER = true;
+const DEFAULT_MARKING_INTERVAL = 3;
 const DEFAULT_OLD_COLOR = "#cc3333";
 const DEFAULT_OPENED_COLOR = "#660099";
 const DEFAULT_OLD_OPENED_COLOR = "#339933";
@@ -7,11 +10,20 @@ const DEFAULT_RESPONSE_INCREASE_COLOR = "#cc3333";
 const DEFAULT_RESPONSE_INCREASE_SIZE = 12;
 const MID_REQUEST_CATALOG_UPDATE = 0x11;
 const MID_NOTIFY_OPENED_THREAD_TO_CAT = 0x12;
+const DEFAULT_REMAINING_TIME = 5; // 最低保持時間中のスレの残り時間が5分以下になったら「古いスレ」としてマーク
+let useOldSort = DEFAULT_USE_OLD_SORT;
 let oldMarkCount = DEFAULT_OLD_MARK_COUNT;
+let useResponseNumber = DEFAULT_USE_RESPONSE_NUMBER;
+let markingInterval = DEFAULT_MARKING_INTERVAL;
 let oldColor = DEFAULT_OLD_COLOR;
 let openedColor = DEFAULT_OPENED_COLOR;
 let oldOpenedColor = DEFAULT_OLD_OPENED_COLOR;
 let frameThickness = DEFAULT_FRAME_THICKNESS;
+let remainingTime = DEFAULT_REMAINING_TIME;
+let maxNum = 0;
+let holdTime = 0;
+let latestResNumber = 0;
+let timerInterval = null;
 
 function onError(e) {   // eslint-disable-line no-unused-vars
     //console.log("KOSHIAN_catalog_marker/cat.js error:");
@@ -29,38 +41,16 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
 
     document.body.setAttribute("__KOSHIAN_catalog_sort", "true");   // KOSHIAN リロード拡張 改へカタログソート可を通知
 
-    //
-    // 古い順のスレッドリストを取得
-    //
-    let xml = new XMLHttpRequest();
-    xml.open("GET", `${window.location.protocol + "//" + window.location.host + window.location.pathname + "?mode=cat&sort=2"}`);
-    xml.responseType = "document";
-    xml.onload = (e) => {   // eslint-disable-line no-unused-vars
-        if (xml.status != 200) {
-            return;
+    markOldThreads(cattable);
+    if (useResponseNumber && markingInterval > 0) {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
-
-        let curThreadList = cattable.getElementsByTagName("a");
-        let sortedCattable = xml.responseXML.getElementById("cattable") || xml.responseXML.querySelector('body > table[border="1"]');
-        let sortedThreadList = sortedCattable.getElementsByTagName("a");
-        for (let i = 0; i < Math.min(oldMarkCount, sortedThreadList.length); ++i) {
-            let sorted = sortedThreadList.item(i);
-            for (let j = 0; j < curThreadList.length; ++j) {
-                let cur = curThreadList.item(j);
-                if (cur.href == sorted.href) {
-                    cur.parentElement.setAttribute("old", "true");
-                    if (cur.parentElement.getAttribute("opened") == "true") {
-                        cur.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
-                    }
-                    break;
-                }
-            }
-        }
-    };
-    xml.onerror = (e) => {
-        onError(e);
-    };
-    xml.send();
+        timerInterval = setInterval(() => {
+            markOldThreads(cattable);
+        }, Math.max(markingInterval, 1) * 60 *1000);
+    }
 
     //
     // listen thread opened
@@ -71,17 +61,26 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
                 return;
             }
 
-            let anchorList = cattable.getElementsByTagName("a");
-            for (let i = 0; i < anchorList.length; ++i) {
-                let anchor = anchorList.item(i);
-                if (anchor.href && message.url == anchor.href.split("://")[1]) {
-                    anchor.parentElement.setAttribute("opened", "true");
-                    if (anchor.parentElement.getAttribute("old") == "true") {
-                        anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
-                    } else {
-                        anchor.parentElement.style.cssText += "border: solid " + frameThickness + " " + openedColor;
+            let tdList = cattable.getElementsByTagName("td");
+            for (let i = 0; i < tdList.length; ++i) {
+                let td = tdList.item(i);
+                if (td) {
+                    let anchor = td.getElementsByTagName("a")[0];
+                    if (anchor && anchor.href && message.url == anchor.href.split("://")[1]) {
+                        td.setAttribute("opened", "true");
+                        let old = td.getAttribute("old");
+                        let hold = td.getAttribute("hold");
+                        let cssText = "";
+                        if ((old === "true" && !hold) || (old && hold === "red")) {
+                            cssText = "border: solid " + frameThickness + " " + oldOpenedColor;
+                        } else if (old === "expired" && !hold) {
+                            cssText = "border: dotted " + frameThickness + " " + oldOpenedColor;
+                        } else {
+                            cssText = "border: solid " + frameThickness + " " + openedColor;
+                        }
+                        td.style.cssText += cssText;
+                        break;
                     }
-                    break;
                 }
             }
             response();
@@ -157,11 +156,17 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
 
             td.setAttribute("opened", `${data.opened}`);
             if (data.opened) {
-                if (td.getAttribute("old") == "true") {
-                    td.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
+                let old = td.getAttribute("old");
+                let hold = td.getAttribute("hold");
+                let cssText = "";
+                if ((old === "true" && !hold) || (old && hold === "red")) {
+                    cssText = "border: solid " + frameThickness + " " + oldOpenedColor;
+                } else if (old === "expired" && !hold) {
+                    cssText = "border: dotted " + frameThickness + " " + oldOpenedColor;
                 } else {
-                    td.style.cssText += "border: solid " + frameThickness + " " + openedColor;
+                    cssText = "border: solid " + frameThickness + " " + openedColor;
                 }
+                td.style.cssText += cssText;
             }
 
             td.setAttribute("new", `${data.new}`);
@@ -217,6 +222,214 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
 }
 
 /**
+ * 古いスレをマークする
+ * @param {Element} cattable カタログのテーブル要素(#cattable) 
+ */
+function markOldThreads(cattable) {
+    if (useOldSort) {
+        // 古い順のスレッドリストを取得
+        let xml = new XMLHttpRequest();
+        xml.open("GET", `${window.location.protocol + "//" + window.location.host + window.location.pathname + "?mode=cat&sort=2"}`);
+        xml.responseType = "document";
+        xml.onload = () => {
+            if (xml.status != 200) {
+                return;
+            }
+
+            let curThreadList = cattable.getElementsByTagName("a");
+            let sortedCattable = xml.responseXML.getElementById("cattable") || xml.responseXML.querySelector('body > table[border="1"]');
+            let sortedThreadList = sortedCattable.getElementsByTagName("a");
+            for (let i = 0; i < Math.min(oldMarkCount, sortedThreadList.length); ++i) {
+                let sorted = sortedThreadList.item(i);
+                for (let j = 0; j < curThreadList.length; ++j) {
+                    let cur = curThreadList.item(j);
+                    if (cur.href == sorted.href) {
+                        cur.parentElement.setAttribute("old", "true");
+                        if (cur.parentElement.getAttribute("opened") == "true") {
+                            cur.parentElement.style.cssText += "border: solid " + frameThickness + " " + oldOpenedColor;
+                        }
+                        break;
+                    }
+                }
+            }
+        };
+        xml.onerror = (e) => {
+            onError(e);
+        };
+        xml.send();
+    } else if (useResponseNumber) {
+        // 0ページから最新のレスNo.を取得
+        let boardPath = window.location.pathname.match(/^\/([^/]+)\/futaba.php/);
+        if (boardPath) {
+            let xml = new XMLHttpRequest();
+            xml.open("GET", `${window.location.protocol + "//" + window.location.host + "/" + boardPath[1] + "/futaba.htm"}`);
+            xml.responseType = "document";
+            xml.onload = () => {
+                if (xml.status != 200) {
+                    return;
+                }
+
+                let normalDoc = xml.responseXML;
+
+                if (!maxNum) {
+                    let ftb2 = normalDoc.getElementsByClassName("ftb2")[0];
+                    if (ftb2) {
+                        // 保存数取得
+                        let matches = ftb2.textContent.match(/この板の保存数は(\d+)件です/);
+                        maxNum = matches ? parseInt(matches[1], 10) : 0;
+                        // 保持時間取得
+                        matches = ftb2.textContent.match(/最低(\d+時間)?(\d+分)?保持/);
+                        if (matches) {
+                            let hour = matches[1] ? parseInt(matches[1], 10) : 0;
+                            let minute = matches[2] ? parseInt(matches[2], 10) : 0;
+                            holdTime = (hour * 60 + minute) * 60000;
+                        }
+                    }
+                    console.debug("KOSHIAN_catalog_marker/cat.js - maxNum: " + maxNum + ", holdTime: " + (holdTime / 60000) + "min");
+                }
+
+                if (!maxNum) {
+                    // 保存数の取得に失敗したときは「古順」でマークする
+                    console.debug("KOSHIAN_catalog_marker/cat.js - maxNum not found");
+                    useOldSort = true;
+                    useResponseNumber = false;
+                    markOldThreads(cattable);
+                    return;
+                }
+
+                // 0ページ内の最新レスNo.取得
+                let normalThreadList = normalDoc.getElementsByClassName("thre");
+                for (let normalThread of normalThreadList) {
+                    let resNumber = getLatestResponseNumber(normalThread);
+                    if (resNumber) {
+                        latestResNumber = resNumber > latestResNumber ? resNumber : latestResNumber;
+                        break;
+                    }
+                }
+
+                let curTdList = cattable.getElementsByTagName("td");
+                let curTime = Date.now();
+
+                for (let i = 0; i < curTdList.length; ++i) {
+                    let td = curTdList[i];
+                    if (!td) {
+                        break;
+                    }
+
+                    let anchor = td.getElementsByTagName("a")[0];
+                    if (!anchor) {
+                        continue;
+                    }
+
+                    let matches = anchor.href.match(/res\/(\d+)\.htm$/);
+                    if (matches) {
+                        let curResNumber = parseInt(matches[1], 10);
+                        if (curResNumber > latestResNumber) {
+                            latestResNumber = curResNumber;
+                        }
+                        if (latestResNumber - curResNumber > maxNum) {
+                            // スレ消滅
+                            td.setAttribute("old", "expired");
+                        } else if (latestResNumber - curResNumber > maxNum * 9 / 10) {
+                            // 消滅直前
+                            td.setAttribute("old", "true");
+                        } else {
+                            td.removeAttribute("old");
+                        }
+                    }
+
+                    if (holdTime > 0) {
+                        let img = td.getElementsByTagName("img")[0];
+                        if (img) {
+                            let matches = img.src.match(/\/(\d+)s\.jpg$/);
+                            if (matches) {
+                                let threadTime = parseInt(matches[1], 10);
+                                if (curTime - threadTime > holdTime) {
+                                    // 保持時間超過
+                                    td.removeAttribute("hold");
+                                } else if (curTime - threadTime > holdTime - remainingTime * 60 * 1000) {
+                                    // 保持時間直前
+                                    td.setAttribute("hold", "red");
+                                } else {
+                                    // 保持時間内
+                                    td.setAttribute("hold", "true");
+                                }
+                            }
+                        }
+                    }
+
+                    if (td.getAttribute("opened") == "true") {
+                        // futaba thread highlighter K用にstyleを書き込み
+                        let old = td.getAttribute("old");
+                        let hold = td.getAttribute("hold");
+                        let cssText = "";
+                        if ((old === "true" && !hold) || (old && hold === "red")) {
+                            cssText = "border: solid " + frameThickness + " " + oldOpenedColor;
+                        } else if (old === "expired" && !hold) {
+                            cssText = "border: dotted " + frameThickness + " " + oldOpenedColor;
+                        } else {
+                            cssText = "border: solid " + frameThickness + " " + openedColor;
+                        }
+                        td.style.cssText += cssText;
+                    }
+                }
+            };
+            xml.onerror = (e) => {
+                onError(e);
+            };
+            xml.send();
+        } else {
+            // 板のパス名の取得に失敗したときは「古順」でマークする
+            console.debug("KOSHIAN_catalog_marker/cat.js - boardPath not found");
+            useOldSort = true;
+            useResponseNumber = false;
+            markOldThreads(cattable);
+            return;
+        }
+    }
+}
+
+/**
+ * 最新レスNo.取得
+ * @param {Element} threadElement スレの要素(.thre)
+ * @return {number} 最新レスNo.
+ *     見つからない時は0を返す
+ */
+function getLatestResponseNumber(threadElement) {
+    let resNum = 0;
+    let rtdList = threadElement.getElementsByClassName("rtd");
+    let rtdNum = rtdList.length;
+    if (rtdNum > 0) {
+        resNum = getResponseNumber(rtdList[rtdNum - 1]);
+    }
+    if (resNum == 0) {
+        let dataRes = threadElement.getAttribute("data-res");
+        resNum = dataRes ? parseInt(dataRes, 10) : getResponseNumber(threadElement);
+    }
+    return resNum;
+}
+
+/**
+ * レスNo.取得
+ * @param {Element} resElement レスの要素(.rtd or .thre)
+ * @return {number} レスNo. 
+ *     見つからない時は0を返す
+ */
+function getResponseNumber(resElement) {
+    for (let node = resElement.firstChild; node; node = node.nextSibling) {
+        if (node.nodeName == "BLOCKQUOTE") {
+            break;
+        } else if (node.nodeType == Node.TEXT_NODE) {
+            let matches = node.nodeValue.match(/No\.(\d+)/);
+            if (matches) {
+                return parseInt(matches[1], 10);
+            }
+        }
+    }
+    return 0;
+}
+
+/**
  * カタログtableのtbodyの透明度を元に戻す
  * @param {HTMLElement} cattable カタログのtable要素
  */
@@ -246,7 +459,10 @@ function getValueSafely(value, default_value) {
 }
 
 browser.storage.local.get().then((result) => {
+    useOldSort = getValueSafely(result.useOldSort, DEFAULT_USE_OLD_SORT);
     oldMarkCount = getValueSafely(result.oldMarkCount, DEFAULT_OLD_MARK_COUNT);
+    useResponseNumber = getValueSafely(result.useResponseNumber, DEFAULT_USE_RESPONSE_NUMBER);
+    markingInterval = getValueSafely(result.markingInterval, DEFAULT_MARKING_INTERVAL);
     document.documentElement.style.setProperty("--old-color", getValueSafely(result.oldColor, DEFAULT_OLD_COLOR));
     document.documentElement.style.setProperty("--opened-color", getValueSafely(result.openedColor, DEFAULT_OPENED_COLOR));
     document.documentElement.style.setProperty("--old-opened-color", getValueSafely(result.oldOpenedColor, DEFAULT_OLD_OPENED_COLOR));
