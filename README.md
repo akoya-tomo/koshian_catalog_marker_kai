@@ -15,15 +15,19 @@
   - [futaba thread highlighter K](https://greasyfork.org/ja/scripts/36639-futaba-thread-highlighter-k/)の既読スレピックアップに対応  
     futaba thread highlighter Kで既読スレをピックアップできるように変更しました。  
     <img src="images/screenshot03.png?raw=true" alt="スクリーンショット" title="スクリーンショット" width="400px">
-  - [KOSHIAN リロード拡張 改](https://github.com/akoya-tomo/koshian_reload_futaba_kai/)のページ更新無しでのカタログリロードに対応  
+  - [KOSHIAN リロード拡張 改](https://github.com/akoya-tomo/koshian_reload_futaba_kai/)のページ再読み込み無しでのカタログリロードに対応  
   - カタログをレス増加順にソートする機能  
-    ![\(New\)](images/new.png "New") KOSHIAN リロード拡張 改と併用した状態で\[増加順\]ボタンを押すとレス増加順に並べることができます。  
-    但し、KOSHIAN リロード拡張 改のリロード動作のときだけソートされ、ブラウザでページ更新したときはソートされません。  
+    KOSHIAN リロード拡張 改と併用した状態で\[増加順\]ボタンを押すとレス増加順に並べることができます。  
+    但し、KOSHIAN リロード拡張 改のリロード動作のときだけソートされ、ブラウザでページを再読み込みしたときはソートされません。  
   - 新着スレを「New」で表示  
+  - ![\(New\)](images/new.png "New") 板の最新レスNo.から古いスレを算出してマークする機能（デフォルト：有効）  
+    板の最新レスNo.を取得して保存数に到達間際の古いスレをマークします。最低保持時間にも対応しています。  
+    最新レスNo.を周期的に取得してカタログに反映することもできます。（デフォルト：3分間隔　0で無効）  
+    消えたスレは枠線が点線で表示されます。  
 
 ## インストール
 **GitHub**  
-[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.2.1/koshian_catalog_marker_kai-2.2.1-fx.xpi)
+[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.3.0/koshian_catalog_marker_kai-2.3.0-fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
@@ -31,7 +35,8 @@
 * 本アドオンを有効にしたときはオリジナル版を無効にするか削除して下さい。  
 * オリジナル版とは別アドオンなので設定は初期値に戻ります。  
   再度設定をお願い致します。  
-* ![\(New\)](images/new.png "New") KOSHIAN リロード拡張 改と併用時に本アドオンを無効にしたときは開いているカタログを再読み込みしてください。  
+* オプションの設定を変更したときは開いているカタログのページを再読み込みすることで変更が反映されます。  
+* KOSHIAN リロード拡張 改と併用時に本アドオンを無効にしたときは開いているカタログを再読み込みしてください。  
 * [futaba\_catalog\_mod（モダンバージョン）](https://userstyles.org/styles/114129/futaba-catalog-mod-modern)使用時にマークが付かないときは、futaba\_catalog\_mod内の  
 
   ```css
@@ -55,6 +60,8 @@
   - 現時点では仕様となります。カタログをページ更新すると開いたスレにマークが表示されます。  
 
 ## 更新履歴
+* v2.3.0 2019-09-05
+  - 板の最新レスNo.から古いスレを算出してマークする機能を追加
 * v2.2.1 2019-08-16
   - カタログとスレでURIスキーム(http・https)が異なるときに既読マークが付かない不具合を修正
 * v2.2.0 2019-08-10

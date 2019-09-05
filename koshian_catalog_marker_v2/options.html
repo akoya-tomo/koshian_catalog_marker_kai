@@ -9,55 +9,81 @@
 <body>
 
   <form>
-    <label>
-      マークする古いスレの数<br>
-      <input type="number" id="old_mark_count">
-    </label>
-    <br>
+    <fieldset style="min-width: min-content;" class="group">
+      <legend>古いスレの取得方法</legend>
 
-    <label>
-      古いスレの枠色<br>
-      <input type="color" id="old_color">
-    </label>
-    <br>
+      <fieldset style="min-width: min-content;" class="group">
+        <legend>
+          <input type="radio" id="use_old_sort" name="marking_type">
+          <label for="use_old_sort">カタログの古順から取得</label>
+        </legend>
 
-    <label>
-      開いたスレの枠色<br>
-      <input type="color" id="opened_color">
-    </label>
-    <br>
+        <label>
+          マークする古いスレの数<br>
+          <input type="number" id="old_mark_count">
+        </label>
+      </fieldset>
 
-    <label>
-      古い開いたスレの枠色<br>
-      <input type="color" id="old_opened_color">
-    </label>
-    <br>
+      <fieldset style="min-width: min-content;" class="group">
+        <legend>
+          <input type="radio" id="use_response_number" name="marking_type">
+          <label for="use_response_number">板の最新レスNo.を取得して保存数から算出</label>
+        </legend>
 
-    <label>
-      枠の太さ<br>
-      <input type="number" id="frame_thickness">
-    </label>
-    <br>
+        <label>
+          最新レスNo.の取得周期<br>
+          <input type="number" id="marking_interval" min="0" step="1">
+          分間隔（0で無効）
+        </label>
+      </fieldset>
+    </fieldset>
 
-    <label>
-      レス増加数の文字色<br>
-      <input type="color" id="response_increase_color">
-    </label>
-    <br>
+    <p>
+      <label>
+        古いスレの枠色<br>
+        <input type="color" id="old_color">
+      </label>
+      <br>
 
-    <label>
-      レス増加数の文字サイズ<br>
-      <input type="number" id="response_increase_size">
-    </label>
-    <br>
+      <label>
+        開いたスレの枠色<br>
+        <input type="color" id="opened_color">
+      </label>
+      <br>
 
-    <label>
-      記憶するスレの数（板毎）<br>
-      <input type="number" id="max_data_num">
-    </label>
-    <br>
+      <label>
+        古い開いたスレの枠色<br>
+        <input type="color" id="old_opened_color">
+      </label>
+      <br>
 
-    <br>
+      <label>
+        枠の太さ<br>
+        <input type="number" id="frame_thickness">
+      </label>
+      <br>
+
+      <label>
+        レス増加数の文字色<br>
+       <input type="color" id="response_increase_color">
+      </label>
+      <br>
+
+      <label>
+        レス増加数の文字サイズ<br>
+        <input type="number" id="response_increase_size">
+      </label>
+      <br>
+    </p>
+
+    <p>
+      <label>
+        記憶するスレの数（板毎）<br>
+        <input type="number" id="max_data_num">
+      </label>
+      <br>
+    </p>
+
     <button type="submit">Save</button>
   </form>
 

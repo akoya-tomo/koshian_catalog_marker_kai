@@ -7,7 +7,7 @@
     --response-increase-size: 12px;
 }
 
-[old="true"]{
+[old="true"]:not([hold="true"]){
     border: solid;
     border-color: var(--old-color);
     border-width: var(--frame-thickness);
@@ -19,8 +19,34 @@
     border-width: var(--frame-thickness);
 }
 
-[old="true"][opened="true"]{
+[old="true"][opened="true"]:not([hold="true"]){
+    border: solid;
     border-color: var(--old-opened-color);
+    border-width: var(--frame-thickness);
+}
+
+[old="expired"]:not([hold]){
+    border: dotted;
+    border-color: var(--old-color);
+    border-width: var(--frame-thickness);
+}
+
+[old="expired"][opened="true"]:not([hold]){
+    border: dotted;
+    border-color: var(--old-opened-color);
+    border-width: var(--frame-thickness);
+}
+
+[old][hold="red"]{
+    border: solid;
+    border-color: var(--old-color);
+    border-width: var(--frame-thickness);
+}
+
+[old][opened="true"][hold="red"]{
+    border: solid;
+    border-color: var(--old-opened-color);
+    border-width: var(--frame-thickness);
 }
 
 .KOSHIAN_response_increase{
