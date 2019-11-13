@@ -22,7 +22,7 @@ let frameThickness = DEFAULT_FRAME_THICKNESS;
 let remainingTime = DEFAULT_REMAINING_TIME;
 let maxNum = 0;
 let holdTime = 0;
-let latestResNumber = 0;
+let latestResNo = 0;
 let timerInterval = null;
 let is_new_layout = document.getElementById("cattable") ? document.getElementById("cattable").tagName != "TABLE" : false;
 let timerAdded = null;
@@ -308,9 +308,9 @@ function markOldThreads(cattable) {
                 // 0ページ内の最新レスNo.取得
                 let normalThreadList = normalDoc.getElementsByClassName("thre");
                 for (let normalThread of normalThreadList) {
-                    let resNumber = getLatestResponseNumber(normalThread);
-                    if (resNumber) {
-                        latestResNumber = resNumber > latestResNumber ? resNumber : latestResNumber;
+                    let resNo = getLatestResponseNumber(normalThread);
+                    if (resNo) {
+                        latestResNo = resNo > latestResNo ? resNo : latestResNo;
                         break;
                     }
                 }
@@ -331,14 +331,14 @@ function markOldThreads(cattable) {
 
                     let matches = anchor.href.match(/res\/(\d+)\.htm$/);
                     if (matches) {
-                        let curResNumber = parseInt(matches[1], 10);
-                        if (curResNumber > latestResNumber) {
-                            latestResNumber = curResNumber;
+                        let curResNo = parseInt(matches[1], 10);
+                        if (curResNo > latestResNo) {
+                            latestResNo = curResNo;
                         }
-                        if (latestResNumber - curResNumber > maxNum) {
+                        if (latestResNo - curResNo > maxNum) {
                             // スレ消滅
                             td.setAttribute("old", "expired");
-                        } else if (latestResNumber - curResNumber > maxNum * 9 / 10) {
+                        } else if (latestResNo- curResNo > maxNum * 9 / 10) {
                             // 消滅直前
                             td.setAttribute("old", "true");
                         } else {
@@ -404,17 +404,17 @@ function markOldThreads(cattable) {
  *     見つからない時は0を返す
  */
 function getLatestResponseNumber(threadElement) {
-    let resNum = 0;
+    let resNo = 0;
     let rtdList = threadElement.getElementsByClassName("rtd");
     let rtdNum = rtdList.length;
     if (rtdNum > 0) {
-        resNum = getResponseNumber(rtdList[rtdNum - 1]);
+        resNo = getResponseNumber(rtdList[rtdNum - 1]);
     }
-    if (resNum == 0) {
+    if (resNo == 0) {
         let dataRes = threadElement.getAttribute("data-res");
-        resNum = dataRes ? parseInt(dataRes, 10) : getResponseNumber(threadElement);
+        resNo = dataRes ? parseInt(dataRes, 10) : getResponseNumber(threadElement);
     }
-    return resNum;
+    return resNo;
 }
 
 /**
@@ -428,9 +428,16 @@ function getResponseNumber(resElement) {
         if (node.nodeName == "BLOCKQUOTE") {
             break;
         } else if (node.nodeType == Node.TEXT_NODE) {
+            // 旧レスNo.取得
             let matches = node.nodeValue.match(/No\.(\d+)/);
             if (matches) {
                 return parseInt(matches[1], 10);
+            }
+        } else if (node.className == "cno") {
+            // 新レスNo.取得（2019/11～）
+            let resNo = parseInt(node.textContent.replace("No.", ""), 10);
+            if (resNo > 0) {
+                return resNo;
             }
         }
     }
