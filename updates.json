@@ -2,9 +2,9 @@
   "addons": {
     "{AE670138-E325-11E7-A724-0B411743E317}": {
       "updates": [
-        { "version": "2.4.0",
-          "update_link": "https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.4.0/koshian_catalog_marker_kai-2.4.0-fx.xpi",
-          "update_info_url": "https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.4.0/update_info.html"
+        { "version": "2.5.0",
+          "update_link": "https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.5.0/koshian_catalog_marker_kai-2.5.0-fx.xpi",
+          "update_info_url": "https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.5.0/update_info.html"
         }
       ]
     }
