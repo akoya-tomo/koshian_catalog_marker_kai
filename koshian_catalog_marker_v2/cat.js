@@ -428,9 +428,16 @@ function getResponseNumber(resElement) {
         if (node.nodeName == "BLOCKQUOTE") {
             break;
         } else if (node.nodeType == Node.TEXT_NODE) {
+            // 旧レスNo.取得
             let matches = node.nodeValue.match(/No\.(\d+)/);
             if (matches) {
                 return parseInt(matches[1], 10);
+            }
+        } else if (node.className == "cno") {
+            // 新レスNo.取得（2019/11～）
+            let resNo = parseInt(node.textContent.replace("No.", ""), 10);
+            if (resNo > 0) {
+                return resNo;
             }
         }
     }
