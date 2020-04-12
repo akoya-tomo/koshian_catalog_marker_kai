@@ -24,8 +24,6 @@ let maxNum = 0;
 let holdTime = 0;
 let latestResNo = 0;
 let timerInterval = null;
-let is_new_layout = document.getElementById("cattable") ? document.getElementById("cattable").tagName != "TABLE" : false;
-let timerAdded = null;
 
 function onError(e) {   // eslint-disable-line no-unused-vars
     //console.log("KOSHIAN_catalog_marker/cat.js error:");
@@ -63,7 +61,7 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
                 return;
             }
 
-            let tdList = is_new_layout ? cattable.getElementsByClassName("cs") : cattable.getElementsByTagName("td");
+            let tdList = cattable.getElementsByTagName("td");
             for (let i = 0; i < tdList.length; ++i) {
                 let td = tdList.item(i);
                 if (td) {
@@ -92,20 +90,14 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
     //
     // url,レス数のリストを作る
     //
-    let tdList = is_new_layout ? cattable.getElementsByClassName("cs") : cattable.getElementsByTagName("td");
+    let tdList = cattable.getElementsByTagName("td");
     let requestDataList = [];
     for (let i = 0; i < tdList.length; ++i) {
         let td = tdList.item(i);
         let anchors = td.getElementsByTagName("a");
         let url = anchors.length ? (anchors.item(0).href ? anchors.item(0).href.split("://")[1] : null) : null;
-        let count;
-        if (is_new_layout) {
-            let matches = td.innerText.match(/[^\n]+\n\n?(\d+)/);
-            count = matches ? Number(matches[1]) : 0;
-        } else {
-            let fonts = td.getElementsByTagName("font");
-            count = fonts.length ? Number(fonts.item(0).textContent) : 0;
-        }
+        let fonts = td.getElementsByTagName("font");
+        let count = fonts.length ? Number(fonts.item(0).textContent) : 0;
 
         requestDataList.push({
             url: url,
@@ -148,7 +140,7 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
                 if (ret.length == 0) {
                     ret = document.createElement("span");
                     ret.className = "KOSHIAN_response_increase";
-                    return is_new_layout ? td.firstChild.appendChild(ret) : td.appendChild(ret);
+                    return td.appendChild(ret);
                 }else{
                     return ret.item(0);
                 }
@@ -187,7 +179,7 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
             }
         }
 
-        if (!sort || is_new_layout) {
+        if (!sort) {
             if (reorder) {
                 resetOpacity(cattable);
             }
@@ -234,7 +226,7 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
  * @param {Element} cattable カタログのテーブル要素(#cattable) 
  */
 function markOldThreads(cattable) {
-    if (useOldSort && !is_new_layout) {
+    if (useOldSort) {
         // 古い順のスレッドリストを取得
         let xml = new XMLHttpRequest();
         xml.open("GET", `${window.location.protocol + "//" + window.location.host + window.location.pathname + "?mode=cat&sort=2"}`);
@@ -279,21 +271,28 @@ function markOldThreads(cattable) {
 
                 let normalDoc = xml.responseXML;
 
-                if (!maxNum) {
-                    let ftb2 = normalDoc.getElementsByClassName("ftb2")[0];
-                    if (ftb2) {
-                        // 保存数取得
-                        let matches = ftb2.textContent.match(/この板の保存数は(\d+)件です/);
-                        maxNum = matches ? parseInt(matches[1], 10) : 0;
-                        // 保持時間取得
-                        matches = ftb2.textContent.match(/最低(\d+時間)?(\d+分)?保持/);
-                        if (matches) {
-                            let hour = matches[1] ? parseInt(matches[1], 10) : 0;
-                            let minute = matches[2] ? parseInt(matches[2], 10) : 0;
-                            holdTime = (hour * 60 + minute) * 60000;
+                let ftb2 = normalDoc.getElementsByClassName("ftb2")[0];
+                if (ftb2) {
+                    // 保存数取得
+                    let matches = ftb2.textContent.match(/この板の保存数は(\d+)件です/);
+                    if (matches) {
+                        let NewMaxNum = matches ? parseInt(matches[1], 10) : 0;
+                        if (maxNum != NewMaxNum && NewMaxNum > 0) {
+                            maxNum = NewMaxNum;
+                            console.debug("KOSHIAN_catalog_marker/cat.js - maxNum: " + maxNum);
                         }
                     }
-                    console.debug("KOSHIAN_catalog_marker/cat.js - maxNum: " + maxNum + ", holdTime: " + (holdTime / 60000) + "min");
+                    // 保持時間取得
+                    matches = ftb2.textContent.match(/最低(\d+時間)?(\d+分)?保持/);
+                    if (matches) {
+                        let hour = matches[1] ? parseInt(matches[1], 10) : 0;
+                        let minute = matches[2] ? parseInt(matches[2], 10) : 0;
+                        let newHoldTime = (hour * 60 + minute) * 60000;
+                        if (holdTime != newHoldTime) {
+                            holdTime = newHoldTime;
+                            console.debug("KOSHIAN_catalog_marker/cat.js - holdTime: " + (holdTime / 60000) + "min");
+                        }
+                    }
                 }
 
                 if (!maxNum) {
@@ -315,7 +314,7 @@ function markOldThreads(cattable) {
                     }
                 }
 
-                let curTdList = is_new_layout ? cattable.getElementsByClassName("cs") : cattable.getElementsByTagName("td");
+                let curTdList = cattable.getElementsByTagName("td");
                 let curTime = Date.now();
 
                 for (let i = 0; i < curTdList.length; ++i) {
@@ -449,9 +448,6 @@ function getResponseNumber(resElement) {
  * @param {HTMLElement} cattable カタログのtable要素
  */
 function resetOpacity(cattable) {
-    if (is_new_layout) {
-        return;
-    }
     let tbody = cattable.firstChild;
     if (tbody) {
         try {
@@ -494,32 +490,6 @@ browser.storage.local.get().then((result) => {
 
     main();
 
-    if (is_new_layout) {
-        checkAddedThreads();
-    }
-
-    function checkAddedThreads() {
-        let target = document.getElementById("cattable");
-        let config = { childList: true };
-        let observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                let nodes = mutation.addedNodes;
-                for (let node of nodes) {
-                    if (node.classList.contains("cs")) {
-                        if (timerAdded) {
-                            clearTimeout(timerAdded);
-                            timerAdded = null;
-                        }
-                        timerAdded = setTimeout(function() {
-                            timerAdded = null;
-                            main();
-                        }, 100);
-                    }
-                }
-            });
-        });
-        observer.observe(target, config);
-    }
 }, onError);
 
 document.addEventListener("KOSHIAN_cat_reload", (e) => {
