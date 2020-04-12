@@ -271,21 +271,28 @@ function markOldThreads(cattable) {
 
                 let normalDoc = xml.responseXML;
 
-                if (!maxNum) {
-                    let ftb2 = normalDoc.getElementsByClassName("ftb2")[0];
-                    if (ftb2) {
-                        // 保存数取得
-                        let matches = ftb2.textContent.match(/この板の保存数は(\d+)件です/);
-                        maxNum = matches ? parseInt(matches[1], 10) : 0;
-                        // 保持時間取得
-                        matches = ftb2.textContent.match(/最低(\d+時間)?(\d+分)?保持/);
-                        if (matches) {
-                            let hour = matches[1] ? parseInt(matches[1], 10) : 0;
-                            let minute = matches[2] ? parseInt(matches[2], 10) : 0;
-                            holdTime = (hour * 60 + minute) * 60000;
+                let ftb2 = normalDoc.getElementsByClassName("ftb2")[0];
+                if (ftb2) {
+                    // 保存数取得
+                    let matches = ftb2.textContent.match(/この板の保存数は(\d+)件です/);
+                    if (matches) {
+                        let NewMaxNum = matches ? parseInt(matches[1], 10) : 0;
+                        if (maxNum != NewMaxNum && NewMaxNum > 0) {
+                            maxNum = NewMaxNum;
+                            console.debug("KOSHIAN_catalog_marker/cat.js - maxNum: " + maxNum);
                         }
                     }
-                    console.debug("KOSHIAN_catalog_marker/cat.js - maxNum: " + maxNum + ", holdTime: " + (holdTime / 60000) + "min");
+                    // 保持時間取得
+                    matches = ftb2.textContent.match(/最低(\d+時間)?(\d+分)?保持/);
+                    if (matches) {
+                        let hour = matches[1] ? parseInt(matches[1], 10) : 0;
+                        let minute = matches[2] ? parseInt(matches[2], 10) : 0;
+                        let newHoldTime = (hour * 60 + minute) * 60000;
+                        if (holdTime != newHoldTime) {
+                            holdTime = newHoldTime;
+                            console.debug("KOSHIAN_catalog_marker/cat.js - holdTime: " + (holdTime / 60000) + "min");
+                        }
+                    }
                 }
 
                 if (!maxNum) {
