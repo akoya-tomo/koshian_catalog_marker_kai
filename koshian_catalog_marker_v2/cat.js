@@ -10,7 +10,8 @@ const DEFAULT_RESPONSE_INCREASE_COLOR = "#cc3333";
 const DEFAULT_RESPONSE_INCREASE_SIZE = 12;
 const MID_REQUEST_CATALOG_UPDATE = 0x11;
 const MID_NOTIFY_OPENED_THREAD_TO_CAT = 0x12;
-const DEFAULT_REMAINING_TIME = 5; // 最低保持時間中のスレの残り時間が5分以下になったら「古いスレ」としてマーク
+const DEFAULT_REMAINING_TIME = 5;   // 最低保持時間中のスレの残り時間が5分以下になったら「古いスレ」としてマーク
+const DEFAULT_HOLD_TIME = (1 * 60) * 60000;   // デフォルトの最低保持時間（1時間）
 let useOldSort = DEFAULT_USE_OLD_SORT;
 let oldMarkCount = DEFAULT_OLD_MARK_COUNT;
 let useResponseNumber = DEFAULT_USE_RESPONSE_NUMBER;
@@ -259,10 +260,11 @@ function markOldThreads(cattable) {
         xml.send();
     } else if (useResponseNumber) {
         // 0ページから最新のレスNo.を取得
-        let boardPath = window.location.pathname.match(/^\/([^/]+)\/futaba.php/);
-        if (boardPath) {
+        let server = document.domain.match(/^[^.]+/);
+        let path = location.pathname.match(/[^/]+/);
+        if (server && path) {
             let xml = new XMLHttpRequest();
-            xml.open("GET", `${window.location.protocol + "//" + window.location.host + "/" + boardPath[1] + "/futaba.htm"}`);
+            xml.open("GET", `${window.location.protocol + "//" + window.location.host + "/" + path + "/futaba.htm"}`);
             xml.responseType = "document";
             xml.onload = () => {
                 if (xml.status != 200) {
@@ -290,6 +292,12 @@ function markOldThreads(cattable) {
                         let newHoldTime = (hour * 60 + minute) * 60000;
                         if (holdTime != newHoldTime) {
                             holdTime = newHoldTime;
+                            console.debug("KOSHIAN_catalog_marker/cat.js - holdTime: " + (holdTime / 60000) + "min");
+                        }
+                    } else if (server == "may" && path == "b") {
+                        // mayは保持時間の表示が無いときはデフォルト（1時間）をセット
+                        if (holdTime != DEFAULT_HOLD_TIME) {
+                            holdTime = DEFAULT_HOLD_TIME;
                             console.debug("KOSHIAN_catalog_marker/cat.js - holdTime: " + (holdTime / 60000) + "min");
                         }
                     }
