@@ -27,7 +27,7 @@
 
 ## インストール
 **GitHub**  
-[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.5.1/koshian_catalog_marker_kai-2.5.1-fx.xpi)
+[![インストールボタン](images/install_button.png "クリックでアドオンをインストール")](https://github.com/akoya-tomo/koshian_catalog_marker_kai/releases/download/v2.5.2/koshian_catalog_marker_kai-2.5.2-fx.xpi)
 
 ※「接続エラーのため、アドオンをダウンロードできませんでした。」と表示されてインストール出来ない時はリンクを右クリックしてxpiファイルをダウンロードし、メニューのツール→アドオン（またはCtrl+Shift+A）で表示されたアドオンマネージャーのページにxpiファイルをドラッグ＆ドロップして下さい。  
 
@@ -60,6 +60,8 @@
   - 現時点では仕様となります。カタログをページ更新すると開いたスレにマークが表示されます。  
 
 ## 更新履歴
+* v2.5.2 2020-05-23
+  - mayで最低保持時間の表示が無くても最低保持時間を設定するように修正
 * v2.5.1 2020-04-12
   - 最新レスNo.取得時に板の保存数と最低保持時間の情報を更新するように変更
 * v2.5.0 2019-11-13
