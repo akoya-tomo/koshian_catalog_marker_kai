@@ -21,10 +21,12 @@ let openedColor = DEFAULT_OPENED_COLOR;
 let oldOpenedColor = DEFAULT_OLD_OPENED_COLOR;
 let frameThickness = DEFAULT_FRAME_THICKNESS;
 let remainingTime = DEFAULT_REMAINING_TIME;
+let cattable = null;
 let maxNum = 0;
 let holdTime = 0;
 let latestResNo = 0;
 let timerInterval = null;
+let markingRequest = false;
 
 function onError(e) {   // eslint-disable-line no-unused-vars
     //console.log("KOSHIAN_catalog_marker/cat.js error:");
@@ -35,7 +37,7 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
     if(window.location.search.indexOf("cat") < 0){
         return;
     }
-    let cattable = document.getElementById("cattable") || document.querySelector('body > table[border="1"]');
+    cattable = document.getElementById("cattable") || document.querySelector('body > table[border="1"]');
     if (!cattable) {
         return;
     }
@@ -227,6 +229,9 @@ function main(reload = false, sort = false, undo = false, reorder = false) {
  * @param {Element} cattable カタログのテーブル要素(#cattable) 
  */
 function markOldThreads(cattable) {
+    if (!cattable) {
+        return;
+    }
     if (useOldSort) {
         // 古い順のスレッドリストを取得
         let xml = new XMLHttpRequest();
@@ -259,6 +264,11 @@ function markOldThreads(cattable) {
         };
         xml.send();
     } else if (useResponseNumber) {
+        if (document.hidden) {
+            markingRequest = true;
+            return;
+        }
+        markingRequest = false;
         // 0ページから最新のレスNo.を取得
         let server = document.domain.match(/^[^.]+/);
         let path = location.pathname.match(/[^/]+/);
@@ -476,6 +486,24 @@ function resetOpacity(cattable) {
     }));
 }
 
+/**
+ * ページの表示／非表示切り替え検出
+ */
+function handleVisibilityChange() {
+    if (!document.hidden && markingRequest) {
+        // 取得周期経過後にタブがアクティブになったら古いスレのマークを実行
+        markOldThreads(cattable);
+        markingRequest = false;
+        if (timerInterval) {
+            // 取得周期を再設定
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                markOldThreads(cattable);
+            }, Math.max(markingInterval, 1) * 60 *1000);
+        }
+    }
+}
+
 function getValueSafely(value, default_value) {
     return value === undefined ? default_value : value;
 }
@@ -497,6 +525,9 @@ browser.storage.local.get().then((result) => {
     frameThickness = `${getValueSafely(result.frameThickness, DEFAULT_FRAME_THICKNESS)}px`;
 
     main();
+    if (useResponseNumber) {
+        document.addEventListener("visibilitychange", handleVisibilityChange, false);
+    }
 
 }, onError);
 
