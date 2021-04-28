@@ -12,6 +12,7 @@ const MID_REQUEST_CATALOG_UPDATE = 0x11;
 const MID_NOTIFY_OPENED_THREAD_TO_CAT = 0x12;
 const DEFAULT_REMAINING_TIME = 5;   // 最低保持時間中のスレの残り時間が5分以下になったら「古いスレ」としてマーク
 const DEFAULT_HOLD_TIME = (1 * 60) * 60000;   // デフォルトの最低保持時間（1時間）
+const DEFAULT_REQUEST_PERIOD = 15 * 1000;   // デフォルトの最新レスNo.更新間隔（15秒）
 let useOldSort = DEFAULT_USE_OLD_SORT;
 let oldMarkCount = DEFAULT_OLD_MARK_COUNT;
 let useResponseNumber = DEFAULT_USE_RESPONSE_NUMBER;
@@ -27,6 +28,7 @@ let holdTime = 0;
 let latestResNo = 0;
 let timerInterval = null;
 let markingRequest = false;
+let lastRequestTime = 0;
 
 function onError(e) {   // eslint-disable-line no-unused-vars
     //console.log("KOSHIAN_catalog_marker/cat.js error:");
@@ -273,136 +275,77 @@ function markOldThreads(cattable) {
         let server = document.domain.match(/^[^.]+/);
         let path = location.pathname.match(/[^/]+/);
         if (server && path) {
-            let xml = new XMLHttpRequest();
-            xml.open("GET", `${window.location.protocol + "//" + window.location.host + "/" + path + "/futaba.htm"}`);
-            xml.responseType = "document";
-            xml.onload = () => {
-                if (xml.status != 200) {
-                    return;
-                }
+            if (maxNum && latestResNo && Date.now() - lastRequestTime < DEFAULT_REQUEST_PERIOD) {
+                // 前回の最新レスNo.取得から更新間隔時間内なら最新レスNo.を更新せずにマーク
+                markOldResponseNumberThreads();
+            } else {
+                let xml = new XMLHttpRequest();
+                xml.open("GET", `${window.location.protocol + "//" + window.location.host + "/" + path + "/futaba.htm"}`);
+                xml.responseType = "document";
+                xml.onload = () => {
+                    if (xml.status != 200) {
+                        return;
+                    }
 
-                let normalDoc = xml.responseXML;
+                    let normalDoc = xml.responseXML;
 
-                let ftb2 = normalDoc.getElementsByClassName("ftb2")[0];
-                if (ftb2) {
-                    // 保存数取得
-                    let matches = ftb2.textContent.match(/この板の保存数は(\d+)件です/);
-                    if (matches) {
-                        let NewMaxNum = matches ? parseInt(matches[1], 10) : 0;
-                        if (maxNum != NewMaxNum && NewMaxNum > 0) {
-                            maxNum = NewMaxNum;
-                            console.debug("KOSHIAN_catalog_marker/cat.js - maxNum: " + maxNum);
+                    let ftb2 = normalDoc.getElementsByClassName("ftb2")[0];
+                    if (ftb2) {
+                        // 保存数取得
+                        let matches = ftb2.textContent.match(/この板の保存数は(\d+)件です/);
+                        if (matches) {
+                            let NewMaxNum = matches ? parseInt(matches[1], 10) : 0;
+                            if (maxNum != NewMaxNum && NewMaxNum > 0) {
+                                maxNum = NewMaxNum;
+                                console.debug("KOSHIAN_catalog_marker/cat.js - maxNum: " + maxNum);
+                            }
                         }
-                    }
-                    // 保持時間取得
-                    matches = ftb2.textContent.match(/最低(\d+時間)?(\d+分)?保持/);
-                    if (matches) {
-                        let hour = matches[1] ? parseInt(matches[1], 10) : 0;
-                        let minute = matches[2] ? parseInt(matches[2], 10) : 0;
-                        let newHoldTime = (hour * 60 + minute) * 60000;
-                        if (holdTime != newHoldTime) {
-                            holdTime = newHoldTime;
-                            console.debug("KOSHIAN_catalog_marker/cat.js - holdTime: " + (holdTime / 60000) + "min");
-                        }
-                    } else if (server == "may" && path == "b") {
-                        // mayは保持時間の表示が無いときはデフォルト（1時間）をセット
-                        if (holdTime != DEFAULT_HOLD_TIME) {
-                            holdTime = DEFAULT_HOLD_TIME;
-                            console.debug("KOSHIAN_catalog_marker/cat.js - holdTime: " + (holdTime / 60000) + "min");
-                        }
-                    }
-                }
-
-                if (!maxNum) {
-                    // 保存数の取得に失敗したときは「古順」でマークする
-                    console.debug("KOSHIAN_catalog_marker/cat.js - maxNum not found");
-                    useOldSort = true;
-                    useResponseNumber = false;
-                    markOldThreads(cattable);
-                    return;
-                }
-
-                // 0ページ内の最新レスNo.取得
-                let normalThreadList = normalDoc.getElementsByClassName("thre");
-                for (let normalThread of normalThreadList) {
-                    let resNo = getLatestResponseNumber(normalThread);
-                    if (resNo) {
-                        latestResNo = resNo > latestResNo ? resNo : latestResNo;
-                        break;
-                    }
-                }
-
-                let curTdList = cattable.getElementsByTagName("td");
-                let curTime = Date.now();
-
-                for (let i = 0; i < curTdList.length; ++i) {
-                    let td = curTdList[i];
-                    if (!td) {
-                        break;
-                    }
-
-                    let anchor = td.getElementsByTagName("a")[0];
-                    if (!anchor) {
-                        continue;
-                    }
-
-                    let matches = anchor.href.match(/res\/(\d+)\.htm$/);
-                    if (matches) {
-                        let curResNo = parseInt(matches[1], 10);
-                        if (curResNo > latestResNo) {
-                            latestResNo = curResNo;
-                        }
-                        if (latestResNo - curResNo > maxNum) {
-                            // スレ消滅
-                            td.setAttribute("old", "expired");
-                        } else if (latestResNo- curResNo > maxNum * 9 / 10) {
-                            // 消滅直前
-                            td.setAttribute("old", "true");
-                        } else {
-                            td.removeAttribute("old");
-                        }
-                    }
-
-                    if (holdTime > 0) {
-                        let img = td.getElementsByTagName("img")[0];
-                        if (img) {
-                            let matches = img.src.match(/\/(\d+)s\.jpg$/);
-                            if (matches) {
-                                let threadTime = parseInt(matches[1], 10);
-                                if (curTime - threadTime > holdTime) {
-                                    // 保持時間超過
-                                    td.removeAttribute("hold");
-                                } else if (curTime - threadTime > holdTime - remainingTime * 60 * 1000) {
-                                    // 保持時間直前
-                                    td.setAttribute("hold", "red");
-                                } else {
-                                    // 保持時間内
-                                    td.setAttribute("hold", "true");
-                                }
+                        // 保持時間取得
+                        matches = ftb2.textContent.match(/最低(\d+時間)?(\d+分)?保持/);
+                        if (matches) {
+                            let hour = matches[1] ? parseInt(matches[1], 10) : 0;
+                            let minute = matches[2] ? parseInt(matches[2], 10) : 0;
+                            let newHoldTime = (hour * 60 + minute) * 60000;
+                            if (holdTime != newHoldTime) {
+                                holdTime = newHoldTime;
+                                console.debug("KOSHIAN_catalog_marker/cat.js - holdTime: " + (holdTime / 60000) + "min");
+                            }
+                        } else if (server == "may" && path == "b") {
+                            // mayは保持時間の表示が無いときはデフォルト（1時間）をセット
+                            if (holdTime != DEFAULT_HOLD_TIME) {
+                                holdTime = DEFAULT_HOLD_TIME;
+                                console.debug("KOSHIAN_catalog_marker/cat.js - holdTime: " + (holdTime / 60000) + "min");
                             }
                         }
                     }
 
-                    if (td.getAttribute("opened") == "true") {
-                        // futaba thread highlighter K用にstyleを書き込み
-                        let old = td.getAttribute("old");
-                        let hold = td.getAttribute("hold");
-                        let cssText = "";
-                        if ((old === "true" && !hold) || (old && hold === "red")) {
-                            cssText = "border: solid " + frameThickness + " " + oldOpenedColor;
-                        } else if (old === "expired" && !hold) {
-                            cssText = "border: dotted " + frameThickness + " " + oldOpenedColor;
-                        } else {
-                            cssText = "border: solid " + frameThickness + " " + openedColor;
-                        }
-                        td.style.cssText += cssText;
+                    if (!maxNum) {
+                        // 保存数の取得に失敗したときは「古順」でマークする
+                        console.debug("KOSHIAN_catalog_marker/cat.js - maxNum not found");
+                        useOldSort = true;
+                        useResponseNumber = false;
+                        markOldThreads(cattable);
+                        return;
                     }
-                }
-            };
-            xml.onerror = (e) => {
-                onError(e);
-            };
-            xml.send();
+
+                    // 0ページ内の最新レスNo.取得
+                    let normalThreadList = normalDoc.getElementsByClassName("thre");
+                    for (let normalThread of normalThreadList) {
+                        let resNo = getLatestResponseNumber(normalThread);
+                        if (resNo) {
+                            latestResNo = resNo > latestResNo ? resNo : latestResNo;
+                            break;
+                        }
+                    }
+
+                    markOldResponseNumberThreads(true);
+
+                };
+                xml.onerror = (e) => {
+                    onError(e);
+                };
+                xml.send();
+            }
         } else {
             // 板のパス名の取得に失敗したときは「古順」でマークする
             console.debug("KOSHIAN_catalog_marker/cat.js - boardPath not found");
@@ -411,6 +354,81 @@ function markOldThreads(cattable) {
             markOldThreads(cattable);
             return;
         }
+    }
+
+    /**
+     * 古いレスNo.のスレをマークする
+     * @param {boolean} isUpdate 最新レスNo.更新時間を更新するか
+     */
+    function markOldResponseNumberThreads(isUpdate = false) {
+        let curTdList = cattable.getElementsByTagName("td");
+        let curTime = Date.now();
+
+        for (let i = 0; i < curTdList.length; ++i) {
+            let td = curTdList[i];
+            if (!td) {
+                break;
+            }
+
+            let anchor = td.getElementsByTagName("a")[0];
+            if (!anchor) {
+                continue;
+            }
+
+            let matches = anchor.href.match(/res\/(\d+)\.htm$/);
+            if (matches) {
+                let curResNo = parseInt(matches[1], 10);
+                if (curResNo > latestResNo) {
+                    latestResNo = curResNo;
+                }
+                if (latestResNo - curResNo > maxNum) {
+                    // スレ消滅
+                    td.setAttribute("old", "expired");
+                } else if (latestResNo- curResNo > maxNum * 9 / 10) {
+                    // 消滅直前
+                    td.setAttribute("old", "true");
+                } else {
+                    td.removeAttribute("old");
+                }
+            }
+
+            if (holdTime > 0) {
+                let img = td.getElementsByTagName("img")[0];
+                if (img) {
+                    let matches = img.src.match(/\/(\d+)s\.jpg$/);
+                    if (matches) {
+                        let threadTime = parseInt(matches[1], 10);
+                        if (curTime - threadTime > holdTime) {
+                            // 保持時間超過
+                            td.removeAttribute("hold");
+                        } else if (curTime - threadTime > holdTime - remainingTime * 60 * 1000) {
+                            // 保持時間直前
+                            td.setAttribute("hold", "red");
+                        } else {
+                            // 保持時間内
+                            td.setAttribute("hold", "true");
+                        }
+                    }
+                }
+            }
+
+            if (td.getAttribute("opened") == "true") {
+                // futaba thread highlighter K用にstyleを書き込み
+                let old = td.getAttribute("old");
+                let hold = td.getAttribute("hold");
+                let cssText = "";
+                if ((old === "true" && !hold) || (old && hold === "red")) {
+                    cssText = "border: solid " + frameThickness + " " + oldOpenedColor;
+                } else if (old === "expired" && !hold) {
+                    cssText = "border: dotted " + frameThickness + " " + oldOpenedColor;
+                } else {
+                    cssText = "border: solid " + frameThickness + " " + openedColor;
+                }
+                td.style.cssText += cssText;
+            }
+        }
+
+        lastRequestTime = isUpdate ? curTime : lastRequestTime;
     }
 }
 
